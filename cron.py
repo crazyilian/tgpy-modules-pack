@@ -1,0 +1,57 @@
+"""
+    name: cron
+    once: false
+    origin: tgpy://module/cron
+    priority: 1674503569.405455
+    save_locals: true
+"""
+import asyncio
+import datetime
+import logging
+from croniter import croniter
+
+TZ_MOSCOW = datetime.timezone(datetime.timedelta(hours=3))
+
+cron_task = None
+cron_jobs = []
+
+
+async def add_job(func, cron):
+    nonlocal cron_jobs
+    croniter(cron, datetime.datetime.now(TZ_MOSCOW))  # check if cron is valid
+    cron_jobs.append([func, cron])
+    if cron_task is not None:
+        stop_working()
+    start_working()
+
+
+async def work():
+    while True:
+        now = datetime.datetime.now(TZ_MOSCOW)
+        for [func, cron] in cron_jobs:
+            if croniter.match(cron, now):
+                logging.info(f"running {func}")
+                if asyncio.iscoroutinefunction(func):
+                    asyncio.create_task(func())
+                else:
+                    func()
+        sleep_until = None
+        for [func, cron] in cron_jobs:
+            next_time = croniter(cron, now).get_next(datetime.datetime)
+            if sleep_until is None or next_time < sleep_until:
+                sleep_until = next_time
+        if sleep_until is None:
+            break
+        sleep_time = (sleep_until - now).total_seconds()
+        logging.info(f"sleeping for {sleep_time} seconds")
+        await asyncio.sleep(sleep_time)
+
+
+def start_working():
+    nonlocal cron_task
+    cron_task = asyncio.create_task(work())
+
+
+def stop_working():
+    nonlocal cron_task
+    cron_task.cancel()
