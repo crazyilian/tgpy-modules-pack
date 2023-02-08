@@ -2,7 +2,7 @@
     name: share
     once: false
     origin: tgpy://module/share
-    priority: 200
+    priority: 101
     save_locals: true
 """
 from telethon.tl.types import MessageEntityCode

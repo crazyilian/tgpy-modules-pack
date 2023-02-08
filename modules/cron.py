@@ -2,7 +2,7 @@
     name: cron
     once: false
     origin: tgpy://module/cron
-    priority: 1674503569.405455
+    priority: 1001
     save_locals: true
 """
 import asyncio

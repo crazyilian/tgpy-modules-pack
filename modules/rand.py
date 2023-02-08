@@ -7,12 +7,14 @@
 """
 import random
 
+
+@dot
 def rand(s):
     return random.choice(expand(s))
 
-def rand_trans(text):
-    if text.startswith(".rand "):
-        return f"rand({repr(text[6:])})"
-    return text
-
-tgpy.add_code_transformer("rand", rand_trans)
+# def rand_trans(text):
+#     if text.startswith(".rand "):
+#         return f"rand({repr(text[6:])})"
+#     return text
+#
+# tgpy.add_code_transformer("rand", rand_trans)

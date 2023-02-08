@@ -2,7 +2,7 @@
     name: expand
     once: false
     origin: tgpy://module/expand
-    priority: 1674424028.908511
+    priority: 1000
     save_locals: true
 """
 import subprocess

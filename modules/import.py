@@ -9,11 +9,14 @@ try:
     from tgpy.message_design import get_code
 except ImportError:
     from tgpy.message_design import parse_message
+
+
     def get_code(message):
         return parse_message(message).code
 
 import gzip
 import yaml
+
 
 async def import_module():
     orig = await ctx.msg.get_reply_message()
