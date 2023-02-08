@@ -38,7 +38,7 @@ class AutoLoginAPI:
 
     def __getattr__(self, item):
         api_item = self.api.__getattribute__(item)
-        logging.info('item: ' + str(item))
+        logging.info('get api attr: ' + str(item))
         if not asyncio.iscoroutinefunction(api_item):
             return api_item
 
@@ -53,10 +53,9 @@ class AutoLoginAPI:
 
             for _ in range(REQUEST_ATTEMPTS):
                 try:
-                    logging.info('calling api_item')
                     return await api_item(*args, **kwargs)
                 except (pixivpy_async.error.NoTokenError, pixivpy_async.error.NoLoginError) as e:
-                    logging.info('error')
+                    logging.error('Error while calling ' + str(item))
                     logging.error(e)
                     await self.login()
                     await randSleep()
@@ -190,7 +189,6 @@ async def edit_loading(msg):
 async def pixiv(msg):
     text: str = msg.raw_text[len('.pixiv '):]
     commands = list(filter(bool, '\n'.join(filter(lambda line: not line.startswith('>'), text.split('\n'))).split()))
-    logging.info(commands)
     tree = {
         'stats': {
             'partial': (user.text_stats, [['Total illusts', 'Total views', 'Total bookmarks', 'Total followers']]),
