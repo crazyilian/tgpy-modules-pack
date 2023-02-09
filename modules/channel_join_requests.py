@@ -79,8 +79,13 @@ def channel_join_requests_remove_channel(channel_id):
             break
 
 
-def channel_join_requests_get_channels():
-    return ChannelJoinRequestsConfig.channel_ids
+async def channel_join_requests_get_channels():
+    res = {}
+    for channel in join_requests_channels:
+        if channel.name is None:
+            await channel.update_name()
+        res[channel.id] = channel.name
+    return res
 
 
 async def channel_join_requests_update():
