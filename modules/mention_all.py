@@ -1,7 +1,7 @@
 """
-    name: mention-all
+    name: mention_all
     once: false
-    origin: tgpy://module/mention-all
+    origin: tgpy://module/mention_all
     priority: 10001
     save_locals: true
 """
