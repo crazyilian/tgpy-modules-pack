@@ -93,7 +93,7 @@ async def channel_join_requests_update():
         new_users, joined_users_id = await channel.get_updates()
         await channel.save_updates(new_users, joined_users_id)
 
-        if new_users or True:
+        if new_users:
             notify_message = f'New joining requests in channel "{channel.name}"'
             for user in new_users:
                 user = await client.get_entity(user)  # fix user.username == None
