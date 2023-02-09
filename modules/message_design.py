@@ -1,12 +1,12 @@
 """
-    name: message-design
+    name: message_design
     once: false
-    origin: tgpy://module/message-design
+    origin: tgpy://module/message_design
     priority: 2
     save_locals: true
 """
+
 import tgpy.message_design
 
 tgpy.message_design.TITLE = "$>"
 # tgpy.message_design.TITLE_URL = "https://crazyilian.ru"
-

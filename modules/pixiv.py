@@ -147,7 +147,7 @@ async def edit_loading(msg):
     return await msg.edit(msg.text + '\n<code>&gt; Loading...</code>')
 
 
-@dot_msg_handler
+@dot_msg_handler  # dot module
 async def pixiv(msg):
     text: str = msg.raw_text[len('.pixiv '):]
     commands = list(filter(bool, '\n'.join(filter(lambda line: not line.startswith('>'), text.split('\n'))).split()))
@@ -175,9 +175,9 @@ async def pixiv(msg):
     if isinstance(tree, dict):
         return await edit_unknown_command(msg)
     await edit_loading(msg)
-    ans = await try_await(tree[0](*tree[1]))
+    ans = await try_await(tree[0](*tree[1]))  # try_await module
     await msg.edit(ans)
 
 
-config = UniversalModuleConfig('pixiv', ('user_id', 'refresh_token'))
+config = UniversalModuleConfig('pixiv', ('user_id', 'refresh_token'))  # config_loader module
 user = PixivUser(config.user_id, config.refresh_token)

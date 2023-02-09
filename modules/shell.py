@@ -9,7 +9,7 @@ import os
 import subprocess
 
 
-@dot
+@dot  # dot module
 def sh(code):
     proc = subprocess.run([os.getenv("SHELL") or "/bin/sh", "-c", code], encoding="utf-8", stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT)

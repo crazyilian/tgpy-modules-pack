@@ -8,6 +8,7 @@
 
 from telethon import functions
 
+# config_loader module
 ChannelJoinRequestsConfig = UniversalModuleConfig('channel_join_requests',
                                                   default_dict={'channel_ids': [], 'requesters': {}})
 

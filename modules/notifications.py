@@ -6,10 +6,11 @@
     save_locals: true
 """
 
+# config_loader module
 NotificationsConfig = UniversalModuleConfig('notifications', ['notification_channel_id'], [int])
 
 
-@dot
+@dot  # dot module
 async def notify(text, *args, **kwargs):
     if not text:
         text = "Something happened"

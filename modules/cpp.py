@@ -6,9 +6,10 @@
     save_locals: true
 """
 import asyncio
+import subprocess
 
 
-@dot
+@dot  # dot module
 async def cpp(cmd):
     with open("/tmp/tmp.cpp", "w") as out:
         out.write(cmd)

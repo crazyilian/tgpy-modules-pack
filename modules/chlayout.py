@@ -12,7 +12,7 @@ translation_en_to_ru = str.maketrans(dict(zip(en_layout, ru_layout)))
 translation_ru_to_en = str.maketrans(dict(zip(ru_layout, en_layout)))
 
 
-@dot
+@dot  # dot module
 async def chlayout(*_):
     orig = await ctx.msg.get_reply_message()
     if [c for c in orig.text if c in 'qwertyuiop[]asdfghjkl\'~!@#$%^&QWERTYUIOP{}ASDFGHJKLZXCVBNM<>']:
@@ -21,7 +21,7 @@ async def chlayout(*_):
         return orig.text.translate(translation_ru_to_en)
 
 
-@dot_msg_handler
+@dot_msg_handler  # dot module
 async def chlayoutip(msg):
     await msg.delete()
     orig = await msg.get_reply_message()

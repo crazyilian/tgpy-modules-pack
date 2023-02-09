@@ -32,12 +32,12 @@ def _factor(n):
     return factor_ecm(n)
 
 
-@dot
+@dot  # dot module
 def factor(n):
     return sorted(_factor(int(n)))
 
 
-@dot
+@dot  # dot module
 def factor_text(n):
     n = int(n)
     if n == 1:
@@ -45,8 +45,8 @@ def factor_text(n):
     by_power = defaultdict(int)
     for x in factor(n):
         by_power[x] += 1
-    return " × ".join(str(k) if v == 1 else str(k) + superscript(v) for k, v in by_power.items())
+    return " × ".join(str(k) if v == 1 else str(k) + in_power_text(v) for k, v in by_power.items())
 
 
-def superscript(n):
+def in_power_text(n):
     return ("⁻" if n < 0 else "") + "".join("⁰¹²³⁴⁵⁶⁷⁸⁹"[int(c)] for c in str(abs(n)))

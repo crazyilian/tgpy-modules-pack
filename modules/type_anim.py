@@ -8,7 +8,7 @@
 import asyncio
 
 
-@dot_msg_handler
+@dot_msg_handler  # dot module
 async def type(msg):
     await msg.delete()
     text = msg.text[len('.type '):]

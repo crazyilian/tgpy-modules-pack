@@ -23,16 +23,16 @@ def dot_msg_handler(func: DotMsgHandler) -> DotMsgHandler:
     @client.on(telethon.events.NewMessage(outgoing=True))
     @client.on(telethon.events.MessageEdited(outgoing=True))
     async def wrapper(msg: telethon.types.Message) -> None:
-        dot_text = strip_dot_prefix(prefix, strip_docstring(msg.text))
+        dot_text = strip_dot_prefix(prefix, strip_docstring(msg.text))  # dot module
         if dot_text is not None:
-            await try_await(func(msg))
+            await try_await(func(msg))  # try_await module
 
     return func
 
 
 def clear_dot_caller_code(code: str) -> str:
     for prefix in DOT_MSG_HANDLER_PREFIXES:
-        dot_text = strip_dot_prefix(prefix, strip_docstring(code))
+        dot_text = strip_dot_prefix(prefix, strip_docstring(code))  # dot module
         if dot_text is not None:
             return ''
     return code

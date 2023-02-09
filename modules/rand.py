@@ -8,9 +8,9 @@
 import random
 
 
-@dot
+@dot  # dot module
 def rand(s):
-    return random.choice(expand(s))
+    return random.choice(expand(s))  # expand module
 
 # def rand_trans(text):
 #     if text.startswith(".rand "):

@@ -10,8 +10,10 @@ import importlib
 import subprocess
 import sys
 
+
 def install_pip_package(name):
     subprocess.run([sys.executable, "-m", "pip", "install", name], check=True)
+
 
 dep_names = set()
 for module in modules:
