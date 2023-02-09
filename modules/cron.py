@@ -5,6 +5,7 @@
     priority: 1001
     save_locals: true
 """
+
 import asyncio
 import datetime
 import logging
@@ -16,16 +17,16 @@ cron_task = None
 cron_jobs = []
 
 
-async def add_job(func, cron):
+async def cron_add_job(func, cron):
     nonlocal cron_jobs
     croniter(cron, datetime.datetime.now(TZ_MOSCOW))  # check if cron is valid
     cron_jobs.append([func, cron])
     if cron_task is not None:
-        stop_working()
-    start_working()
+        cron_stop_working()
+    cron_start_working()
 
 
-async def work():
+async def cron_work():
     while True:
         now = datetime.datetime.now(TZ_MOSCOW)
         for [func, cron] in cron_jobs:
@@ -47,11 +48,11 @@ async def work():
         await asyncio.sleep(sleep_time)
 
 
-def start_working():
+def cron_start_working():
     nonlocal cron_task
-    cron_task = asyncio.create_task(work())
+    cron_task = asyncio.create_task(cron_work())
 
 
-def stop_working():
+def cron_stop_working():
     nonlocal cron_task
     cron_task.cancel()

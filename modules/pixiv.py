@@ -9,24 +9,16 @@
 import pixivpy_async
 import asyncio
 import random
-from tgpy.console import console
-from tgpy.utils import DATA_DIR
-import dataclasses
-from dataclasses import dataclass
-from typing import Optional
-import yaml
 import time
 
 import logging
 
+REQUEST_ATTEMPTS = 3
+ACCESS_TOKEN_TIMEOUT = 60 * 60 - 5
+
 
 async def randSleep(base=0.1, rand=0.5):
     await asyncio.sleep(base + rand * random.random())
-
-
-REQUEST_ATTEMPTS = 3
-ACCESS_TOKEN_TIMEOUT = 60 * 60 - 5
-CONFIG_FILENAME = DATA_DIR / 'pixiv_config.yml'
 
 
 class AutoLoginAPI:
@@ -139,7 +131,7 @@ class PixivUser:
 
     async def text_stats(self, keys):
         user = await self.user_stats()
-        message = f"🎨 Pixiv stats of [{user['Username']}]({user['URL']})"
+        message = f"🎨 Pixiv stats of <a href='{user['URL']}'>{user['Username']}</a>"
         stats = await self.illusts_stats() | await self.followers_stats()
         for key in keys:
             if key in stats:
@@ -147,42 +139,12 @@ class PixivUser:
         return message
 
 
-@dataclass
-class PixivConfig:
-    user_id: Optional[int] = None
-    refresh_token: Optional[str] = None
-
-    @classmethod
-    def load(cls):
-        try:
-            with open(CONFIG_FILENAME) as file:
-                config_dict = yaml.safe_load(file)
-        except FileNotFoundError:
-            config_dict = {}
-        return cls(**config_dict)
-
-    def save(self):
-        with open(CONFIG_FILENAME, 'w') as file:
-            yaml.safe_dump(dataclasses.asdict(self), file)
-
-
-config = PixivConfig.load()
-if not (config.user_id and config.refresh_token):
-    console.print('[bold magenta] Pixiv module configuration is incomplete.')
-    config.user_id = int(console.input('│ Please enter user id: '))
-    config.refresh_token = console.input('│ Please enter refresh token: ')
-    config.save()
-
-user = PixivUser(config.user_id, config.refresh_token)
-
-
 async def edit_unknown_command(msg):
-    return await msg.edit(msg.text + '\n<code>&gt; Unknown pixiv module command</code>', parse_mode="html",
-                          link_preview=False)
+    return await msg.edit(msg.text + '\n<code>&gt; Unknown pixiv module command</code>')
 
 
 async def edit_loading(msg):
-    return await msg.edit(msg.text + '\n<code>&gt; Loading...</code>', parse_mode="html", link_preview=False)
+    return await msg.edit(msg.text + '\n<code>&gt; Loading...</code>')
 
 
 @dot_msg_handler
@@ -214,4 +176,8 @@ async def pixiv(msg):
         return await edit_unknown_command(msg)
     await edit_loading(msg)
     ans = await try_await(tree[0](*tree[1]))
-    await msg.edit(ans, parse_mode="md", link_preview=False)
+    await msg.edit(ans)
+
+
+config = UniversalModuleConfig('pixiv', ('user_id', 'refresh_token'))
+user = PixivUser(config.user_id, config.refresh_token)
