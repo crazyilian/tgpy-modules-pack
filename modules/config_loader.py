@@ -24,7 +24,7 @@ class UniversalModuleConfig:
         if default_dict is None:
             default_dict = {}
 
-        self.filename = DATA_DIR / 'module_configs' / f'{module_name}_config.yml'
+        self.filename = DATA_DIR / 'modules-config' / f'{module_name}_config.yml'
 
         self.load()
         correct_config = True
