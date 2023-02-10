@@ -37,7 +37,7 @@ def spelling_text(text):
 @dot  # dot module
 async def spelling(*_):
     orig = await ctx.msg.get_reply_message()
-    text = spelling_text(orig.text)
+    text = spelling_text(orig.raw_text)  # prevent html tags because of return type in <code>
     return text
 
 
