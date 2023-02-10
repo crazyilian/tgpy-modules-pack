@@ -50,18 +50,18 @@ async def spellingip(msg):
 
 
 async def _func(*_):
-    await spelling(*_)
+    return await spelling(*_)
 
 
 for name in ['spellign', 'speling', 'spelign']:
     _func.__name__ = name
-    dot(_func)
+    dot(_func)  # dot module
 
 
 async def _func(msg):
-    await spellingip(msg)
+    return await spellingip(msg)
 
 
 for name in ['spellignip', 'spelingip', 'spelignip', 'spellignpi', 'spelingpi', 'spelignpi']:
     _func.__name__ = name
-    dot_msg_handler(_func)
+    dot_msg_handler(_func)  # dot_msg_handler module
