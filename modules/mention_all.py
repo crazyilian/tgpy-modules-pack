@@ -13,7 +13,7 @@ def get_name(user, try_username=True):
     return f'<a href="tg://user?id={user.id}">{user.first_name}</a>'
 
 
-@dot_msg_handler
+@dot_msg_handler  # dot_msg_handler module
 async def mention_all_names(msg):
     users = filter(lambda x: not x.bot, await client.get_participants(msg.chat_id))
     names = list(map(lambda u: get_name(u, False), users))
@@ -22,7 +22,7 @@ async def mention_all_names(msg):
     await msg.delete()
 
 
-@dot_msg_handler
+@dot_msg_handler  # dot_msg_handler module
 async def mention_all(msg):
     users = filter(lambda x: not x.bot, await client.get_participants(msg.chat_id))
     names = list(map(lambda u: get_name(u, True), users))

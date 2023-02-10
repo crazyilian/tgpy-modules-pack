@@ -147,7 +147,7 @@ async def edit_loading(msg):
     return await msg.edit(msg.text + '\n<code>&gt; Loading...</code>')
 
 
-@dot_msg_handler  # dot module
+@dot_msg_handler  # dot_msg_handler module
 async def pixiv(msg):
     text: str = msg.raw_text[len('.pixiv '):]
     commands = list(filter(bool, '\n'.join(filter(lambda line: not line.startswith('>'), text.split('\n'))).split()))

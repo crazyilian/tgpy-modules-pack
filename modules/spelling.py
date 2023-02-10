@@ -41,7 +41,7 @@ async def spelling(*_):
     return text
 
 
-@dot_msg_handler  # dot module
+@dot_msg_handler  # dot_msg_handler module
 async def spellingip(msg):
     await msg.delete()
     orig = await msg.get_reply_message()

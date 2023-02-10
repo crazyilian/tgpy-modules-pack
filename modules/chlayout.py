@@ -21,7 +21,7 @@ async def chlayout(*_):
         return orig.text.translate(translation_ru_to_en)
 
 
-@dot_msg_handler  # dot module
+@dot_msg_handler  # dot_msg_handler module
 async def chlayoutip(msg):
     await msg.delete()
     orig = await msg.get_reply_message()

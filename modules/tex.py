@@ -8,6 +8,6 @@
 import unicodeit
 
 
-@dot_msg_handler  # dot module
+@dot_msg_handler  # dot_msg_handler module
 async def tex(msg):
     await msg.edit(unicodeit.replace(msg.text))
