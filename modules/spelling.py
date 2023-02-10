@@ -47,3 +47,21 @@ async def spellingip(msg):
     orig = await msg.get_reply_message()
     text = spelling_text(orig.text)
     await orig.edit(text)
+
+
+async def _func(*_):
+    await spelling(*_)
+
+
+for name in ['spellign', 'speling', 'spelign']:
+    _func.__name__ = name
+    dot(_func)
+
+
+async def _func(msg):
+    await spellingip(msg)
+
+
+for name in ['spellignip', 'spelingip', 'spelignip', 'spellignpi', 'spelingpi', 'spelignpi']:
+    _func.__name__ = name
+    dot_msg_handler(_func)
