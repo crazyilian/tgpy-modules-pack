@@ -1,7 +1,7 @@
 """
-    name: spelling
+    name: fix_typo
     once: false
-    origin: tgpy://module/spelling
+    origin: tgpy://module/fix_typo
     priority: 1676066830.3317404
     save_locals: true
 """
@@ -17,7 +17,7 @@ spellers = {
 logging.info("Spellers are loaded")
 
 
-def spelling_get_langs_probabilities(text):
+def typo_get_langs_probabilities(text):
     en_cnt = sum(ord('a') <= ord(c) <= ord('z') for c in text.lower())
     ru_cnt = sum(ord('а') <= ord(c) <= ord('я') for c in text.lower())
     return {
@@ -26,25 +26,25 @@ def spelling_get_langs_probabilities(text):
     }
 
 
-def spelling_text(text):
-    probabilities = spelling_get_langs_probabilities(text)
+def typo_fix_text(text):
+    probabilities = typo_get_langs_probabilities(text)
     for lang in spellers:
         if probabilities[lang] > 0.3:
             text = spellers[lang](text)
     return text
 
 
-@dot_prefixes('spelling', 'spellign', 'speling', 'spelign')  # dot module
-async def spelling(*_):
+@dot_prefixes('typo', 'ytpo', 'tpyo', 'tyop')  # dot module
+async def typo(*_):
     orig = await ctx.msg.get_reply_message()
-    text = spelling_text(orig.raw_text)  # not .text to prevent html tags because of return type in <code>
+    text = typo_fix_text(orig.raw_text)  # not .text to prevent html tags because of return type in <code>
     return text
 
 
-@dot_msg_handler_prefixes('spellingip', 'spellignip', 'spelingip', 'spelignip',
-                          'spellingpi', 'spellignpi', 'spelingpi', 'spelignpi')  # dot_msg_handler module
-async def spellingip(msg):
+@dot_msg_handler_prefixes('typoip', 'ytpoip', 'tpyoip', 'tyopip',
+                          'typopi', 'ytpopi', 'tpyopi', 'tyoppi',)  # dot_msg_handler module
+async def typoip(msg):
     await msg.delete()
     orig = await msg.get_reply_message()
-    text = spelling_text(orig.text)
+    text = typo_fix_text(orig.text)
     await orig.edit(text)
