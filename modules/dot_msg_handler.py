@@ -23,11 +23,29 @@ def dot_msg_handler(func: DotMsgHandler) -> DotMsgHandler:
     @client.on(telethon.events.NewMessage(outgoing=True))
     @client.on(telethon.events.MessageEdited(outgoing=True))
     async def wrapper(msg: telethon.types.Message) -> None:
-        dot_text = strip_dot_prefix(prefix, strip_docstring(msg.text))  # dot module
+        dot_text = strip_dot_prefix(prefix, strip_docstring(msg.raw_text))  # dot module
         if dot_text is not None:
             await try_await(func(msg))  # try_await module
 
     return func
+
+
+def dot_msg_handler_prefixes(*prefixes):
+    def dot_msg_handler_(func: DotMsgHandler) -> DotMsgHandler:
+        """Run some handler on code that starts with some prefixes."""
+        DOT_MSG_HANDLER_PREFIXES.extend(prefixes)
+
+        @client.on(telethon.events.NewMessage(outgoing=True))
+        @client.on(telethon.events.MessageEdited(outgoing=True))
+        async def wrapper(msg: telethon.types.Message) -> None:
+            first, dot_text = (strip_docstring(msg.raw_text) + ' ').replace('\n', ' ', 1).split(' ', 1)
+            prefix = first[1:]
+            if first.startswith('.') and prefix in prefixes:
+                await try_await(func(msg))  # try_await module
+
+        return func
+
+    return dot_msg_handler_
 
 
 def clear_dot_caller_code(code: str) -> str:

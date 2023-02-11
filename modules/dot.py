@@ -72,3 +72,42 @@ def dot(func: DotHandler) -> DotHandler:
     tgpy.add_code_transformer(f'dot-handler-{prefix}', wrapper)
 
     return func
+
+
+def dot_prefixes(*prefixes):
+    def dot_(func: DotHandler) -> DotHandler:
+        """Run some handler on code that starts with some prefixes."""
+        DOT_HANDLERS[prefixes[0]] = func
+
+        def wrapper(code: str) -> str:
+            first, dot_text = (strip_docstring(code) + ' ').replace('\n', ' ', 1).split(' ', 1)
+            dot_text = dot_text[:-1]
+            prefix = first[1:]
+            if first.startswith('.') and prefix in prefixes:
+                return f'await try_await(DOT_HANDLERS[{repr(prefix)}]({repr(dot_text)}))'
+            return code
+
+        tgpy.add_code_transformer(f'dot-handler-{prefixes[0]}', wrapper)
+        return func
+
+    return dot_
+
+
+def dot_transformer_prefixes(*prefixes):
+    def dot_transformer_(func: Transformer) -> Transformer:
+        """Add transformer for code that starts with some prefixes."""
+
+        def wrapper(code: str) -> str:
+            first, dot_text = (strip_docstring(code) + ' ').replace('\n', ' ', 1).split(' ', 1)
+            dot_text = dot_text[:-1]
+            prefix = first[1:]
+            if first.startswith('.') and prefix in prefixes:
+                return func(dot_text)
+            else:
+                return code
+
+        tgpy.add_code_transformer(f'dot-transformer-{prefixes[0]}', wrapper)
+
+        return func
+
+    return dot_transformer_
