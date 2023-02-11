@@ -6,6 +6,8 @@
     save_locals: true
 """
 
+# WARNING: long spellers loading, so TGPy will take ~9 seconds longer to start
+
 from autocorrect import Speller
 import logging
 
@@ -42,7 +44,7 @@ async def typo(*_):
 
 
 @dot_msg_handler_prefixes('typoip', 'ytpoip', 'tpyoip', 'tyopip',
-                          'typopi', 'ytpopi', 'tpyopi', 'tyoppi',)  # dot_msg_handler module
+                          'typopi', 'ytpopi', 'tpyopi', 'tyoppi', )  # dot_msg_handler module
 async def typoip(msg):
     await msg.delete()
     orig = await msg.get_reply_message()

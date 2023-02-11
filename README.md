@@ -1,4 +1,6 @@
-# TGPy modules (by crazyilian)
+# TGPy modules by crazyilian
+
+Modules pack for [TGpy](https://github.com/tm-a-t/TGPy).
 
 ## Installation
 
