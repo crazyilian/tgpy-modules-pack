@@ -34,34 +34,17 @@ def spelling_text(text):
     return text
 
 
-@dot  # dot module
+@dot_prefixes('spelling', 'spellign', 'speling', 'spelign')  # dot module
 async def spelling(*_):
     orig = await ctx.msg.get_reply_message()
-    text = spelling_text(orig.raw_text)  # prevent html tags because of return type in <code>
+    text = spelling_text(orig.raw_text)  # not .text to prevent html tags because of return type in <code>
     return text
 
 
-@dot_msg_handler  # dot_msg_handler module
+@dot_msg_handler_prefixes('spellingip', 'spellignip', 'spelingip', 'spelignip',
+                          'spellingpi', 'spellignpi', 'spelingpi', 'spelignpi')  # dot_msg_handler module
 async def spellingip(msg):
     await msg.delete()
     orig = await msg.get_reply_message()
     text = spelling_text(orig.text)
     await orig.edit(text)
-
-
-async def _func(*_):
-    return await spelling(*_)
-
-
-for name in ['spellign', 'speling', 'spelign']:
-    _func.__name__ = name
-    dot(_func)  # dot module
-
-
-async def _func(msg):
-    return await spellingip(msg)
-
-
-for name in ['spellignip', 'spelingip', 'spelignip', 'spellignpi', 'spelingpi', 'spelignpi']:
-    _func.__name__ = name
-    dot_msg_handler(_func)  # dot_msg_handler module
