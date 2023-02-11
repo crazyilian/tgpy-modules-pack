@@ -84,7 +84,7 @@ def dot_prefixes(*prefixes):
             dot_text = dot_text[:-1]
             prefix = first[1:]
             if first.startswith('.') and prefix in prefixes:
-                return f'await try_await(DOT_HANDLERS[{repr(prefix)}]({repr(dot_text)}))'
+                return f'await try_await(DOT_HANDLERS[{repr(prefixes[0])}]({repr(dot_text)}))'
             return code
 
         tgpy.add_code_transformer(f'dot-handler-{prefixes[0]}', wrapper)
