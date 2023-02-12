@@ -51,7 +51,8 @@ def dot_transformer(func: Transformer) -> Transformer:
         else:
             return code
 
-    tgpy.add_code_transformer(f'dot-transformer-{prefix}', wrapper)
+    #tgpy.add_code_transformer(f'dot-transformer-{prefix}', wrapper)
+    tgpy.code_transformers.insert(0, (f'dot-transformer-{prefix}', wrapper))
 
     return func
 
