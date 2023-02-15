@@ -46,7 +46,7 @@ class TrackLastSeenModule:
             if isinstance(event.status, telethon.types.UserStatusOnline):
                 text = f'{name} online'
             elif isinstance(event.status, telethon.types.UserStatusOffline):
-                text = f'{name} offline'
+                text = f'{name} disconnected'
             else:
                 text = f'{name} {event.status.__class__.__name__}'
             await notify(text, chat_id=self.config.notify_chat_id)  # pet_bot module
