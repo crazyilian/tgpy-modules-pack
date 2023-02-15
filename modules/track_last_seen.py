@@ -11,6 +11,7 @@ import asyncio
 
 class TrackLastSeenModule:
     def __init__(self):
+        # config_loader module
         self.config = UniversalModuleConfig('track_last_seen', ['notify_chat_id'], [int],
                                             default_dict={'watches': {}})  # config_loader module
         self.handlers = []

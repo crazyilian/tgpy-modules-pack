@@ -6,13 +6,12 @@
     save_locals: true
 """
 
-import logging
-
 import telethon
 from tgpy.utils import DATA_DIR
 from tgpy import app
 import asyncio
 
+# config_loader module
 PetBotConfig = UniversalModuleConfig('pet_bot', ['bot_token'], [str],
                                      default_dict={'session_filename': str(DATA_DIR / 'PetBot.session')})
 
