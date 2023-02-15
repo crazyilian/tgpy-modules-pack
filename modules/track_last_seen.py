@@ -39,7 +39,7 @@ class TrackLastSeenModule:
 
         @client.on(telethon.events.UserUpdate(chats=add_handler, func=lambda e: e.status))
         async def user_update_event_handler(event):
-            name = self.config.watches.get(id, None)
+            name = self.config.watches.get(event.user_id, None)
             if name is None:
                 return
             text = ''
