@@ -13,7 +13,7 @@ import logging
 
 logging.info("Loading spellers")
 spellers = {
-    'ru': Speller(lang='ru'),
+    'ru': Speller(lang='ru', threshold=30),
     'en': Speller(lang='en')
 }
 logging.info("Spellers are loaded")
