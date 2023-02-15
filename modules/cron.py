@@ -17,7 +17,7 @@ cron_task = None
 cron_jobs = []
 
 
-async def cron_add_job(func, cron):
+def cron_add_job(func, cron):
     nonlocal cron_jobs
     croniter(cron, datetime.datetime.now(TZ_MOSCOW))  # check if cron is valid
     cron_jobs.append([func, cron])

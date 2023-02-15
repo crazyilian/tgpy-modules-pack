@@ -55,12 +55,12 @@ class UniversalModuleConfig:
             self.config = {}
 
     def __getattr__(self, item):
-        logging.info(f"getattr {item}")
+        # logging.info(f"getattr {item}")
         return self.config[item]
 
     def __setattr__(self, key, value):
         if hasattr(self, key):
             super(UniversalModuleConfig, self).__setattr__(key, value)
         else:
-            logging.info(f"setattr {key}: {value}")
+            # logging.info(f"setattr {key}: {value}")
             self.config[key] = value

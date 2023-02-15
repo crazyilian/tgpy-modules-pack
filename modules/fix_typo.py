@@ -6,7 +6,7 @@
     save_locals: true
 """
 
-# WARNING: long spellers loading, so TGPy will take ~9 seconds longer to start
+# WARNING: long spellers loading, so TGPy will take 3-10 seconds longer to start
 
 from autocorrect import Speller
 import logging
