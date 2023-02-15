@@ -48,7 +48,7 @@ class TrackLastSeenModule:
                 text = f'{name} offline'
             else:
                 text = f'{name} {event.status.__class__.__name__}'
-            await client.send_message(self.config.notify_chat_id, text)
+            await notify(text, chat_id=self.config.notify_chat_id)  # pet_bot module
 
     async def remove(self, *entities):
         id_name = await self.get_id_name_by_entities(entities)

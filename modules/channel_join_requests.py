@@ -95,7 +95,7 @@ class ChannelJoinRequestsModule:
                 for user in new_users:
                     user = await client.get_entity(user)  # fix user.username == None
                     notify_message += f'\n' + get_name(user)  # mention_all module
-                await notify(notify_message)  # notification module
+                await notify(notify_message)  # pet_bot module
 
 
 channel_join_requests = ChannelJoinRequestsModule()
