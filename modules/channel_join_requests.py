@@ -5,24 +5,20 @@
     priority: 1673128541.938998
     save_locals: true
 """
-
-from telethon import functions
-
-# config_loader module
-ChannelJoinRequestsConfig = UniversalModuleConfig('channel_join_requests',
-                                                  default_dict={'channel_ids': [], 'requesters': {}})
+import telethon
 
 
-class ChannelJoinRequests:
-    def __init__(self, channel_id):
+class OneChannelJoinRequests:
+    def __init__(self, channel_id, module):
+        self.module = module
         self.id = channel_id
         self.name = None
 
     def get_requesters(self):
-        return ChannelJoinRequestsConfig.requesters[self.id]
+        return self.module.config.requesters[self.id]
 
     async def get_updates(self):
-        full_channel = await client(functions.channels.GetFullChannelRequest(self.id))
+        full_channel = await client(telethon.functions.channels.GetFullChannelRequest(self.id))
         self.name = full_channel.chats[0].title
 
         new_users = []
@@ -39,66 +35,67 @@ class ChannelJoinRequests:
 
     async def save_updates(self, new_users, joined_users_id):
         for user in new_users:
-            ChannelJoinRequestsConfig.requesters[self.id].append(user.id)
+            self.module.config.requesters[self.id].append(user.id)
         for user_id in joined_users_id:
-            ChannelJoinRequestsConfig.requesters[self.id].remove(user_id)
-        ChannelJoinRequestsConfig.save()
+            self.module.config.requesters[self.id].remove(user_id)
+        self.module.config.save()
 
     async def update_name(self):
-        full_channel = await client(functions.channels.GetFullChannelRequest(self.id))
+        full_channel = await client(telethon.functions.channels.GetFullChannelRequest(self.id))
         self.name = full_channel.chats[0].title
         return self.name
 
 
-join_requests_channels = [ChannelJoinRequests(id) for id in ChannelJoinRequestsConfig.channel_ids]
+class ChannelJoinRequestsModule:
+    def __init__(self):
+        # config_loader module
+        self.config = UniversalModuleConfig('channel_join_requests',
+                                            default_dict={'channel_ids': [], 'requesters': {}})
+        self.channels = [OneChannelJoinRequests(id, self) for id in self.config.channel_ids]
+        cron_add_job(self.update, "0 * * * *")  # cron module
+
+    def get_requesters(self):
+        result = {}
+        for channel in self.channels:
+            result[channel.id] = channel.get_requesters()
+        return result
+
+    def add_channel(self, channel_id):
+        self.config.channel_ids.append(channel_id)
+        self.config.requesters[channel_id] = []
+        self.config.save()
+        self.channels.append(OneChannelJoinRequests(channel_id, self))
+
+    def remove_channel(self, channel_id):
+        if channel_id not in self.config.channel_ids:
+            return
+        self.config.channel_ids.remove(channel_id)
+        self.config.requesters.pop(channel_id)
+        self.config.save()
+        for ind, channel in enumerate(self.channels, 0):
+            if channel.id == channel_id:
+                self.channels.pop(ind)
+                break
+
+    async def get_channels(self):
+        res = {}
+        for channel in self.channels:
+            if channel.name is None:
+                await channel.update_name()
+            res[channel.id] = channel.name
+        return res
+
+    async def update(self):
+        for channel in self.channels:
+            new_users, joined_users_id = await channel.get_updates()
+            await channel.save_updates(new_users, joined_users_id)
+
+            if new_users:
+                notify_message = f'New joining requests in channel "{channel.name}"'
+                for user in new_users:
+                    user = await client.get_entity(user)  # fix user.username == None
+                    notify_message += f'\n' + get_name(user)  # mention_all module
+                await notify(notify_message)  # notification module
 
 
-def channel_join_requests_get_requesters():
-    result = {}
-    for channel in join_requests_channels:
-        result[channel.id] = channel.get_requesters()
-    return result
-
-
-def channel_join_requests_add_channel(channel_id):
-    ChannelJoinRequestsConfig.channel_ids.append(channel_id)
-    ChannelJoinRequestsConfig.requesters[channel_id] = []
-    ChannelJoinRequestsConfig.save()
-    join_requests_channels.append(ChannelJoinRequests(channel_id))
-
-
-def channel_join_requests_remove_channel(channel_id):
-    if channel_id not in ChannelJoinRequestsConfig.channel_ids:
-        return
-    ChannelJoinRequestsConfig.channel_ids.remove(channel_id)
-    ChannelJoinRequestsConfig.requesters.pop(channel_id)
-    ChannelJoinRequestsConfig.save()
-    for ind, channel in enumerate(join_requests_channels, 0):
-        if channel.id == channel_id:
-            join_requests_channels.pop(ind)
-            break
-
-
-async def channel_join_requests_get_channels():
-    res = {}
-    for channel in join_requests_channels:
-        if channel.name is None:
-            await channel.update_name()
-        res[channel.id] = channel.name
-    return res
-
-
-async def channel_join_requests_update():
-    for channel in join_requests_channels:
-        new_users, joined_users_id = await channel.get_updates()
-        await channel.save_updates(new_users, joined_users_id)
-
-        if new_users:
-            notify_message = f'New joining requests in channel "{channel.name}"'
-            for user in new_users:
-                user = await client.get_entity(user)  # fix user.username == None
-                notify_message += f'\n' + get_name(user)  # mention_all module
-            await notify(notify_message)  # notification module
-
-
-cron_add_job(channel_join_requests_update, "0 * * * *")  # cron module
+channel_join_requests = ChannelJoinRequestsModule()
