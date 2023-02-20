@@ -25,7 +25,7 @@ async def factor_ecm(n):
 
 
 async def _factor(n):
-    if await await_sync(sympy.isprime, n):
+    if await await_sync(sympy.isprime, n):  # try_await module
         return [n]
     if n < 10 ** 38:
         return await factor_rho(n)
