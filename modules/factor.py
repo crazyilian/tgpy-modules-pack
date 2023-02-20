@@ -11,12 +11,12 @@ import sympy
 
 
 async def factor_rho(n):
-    res = await run_shell(f"factor {n}")[0]
+    res = (await run_shell(f"factor {n}"))[0]
     return list(map(int, res.partition(":")[2].split()))
 
 
 async def factor_ecm(n):
-    res = await run_shell(f"echo {n} | ecm -q 3000000")
+    res = (await run_shell(f"echo {n} | ecm -q 3000000"))[0]
     prefactors = list(map(int, res.split()))
     factors = []
     for prefactor in prefactors:
@@ -25,7 +25,7 @@ async def factor_ecm(n):
 
 
 async def _factor(n):
-    if sympy.isprime(n):
+    if await await_sync(sympy.isprime, n):
         return [n]
     if n < 10 ** 38:
         return await factor_rho(n)

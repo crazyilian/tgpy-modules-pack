@@ -6,6 +6,16 @@
     save_locals: true
 """
 
+import concurrent.futures
+
+
+async def await_sync(func, *args, highcpu=False):
+    loop = asyncio.get_event_loop()
+    if not highcpu:
+        return await loop.run_in_executor(None, func, *args)
+    with concurrent.futures.ProcessPoolExecutor() as pool:
+        return await loop.run_in_executor(pool, func, *args)
+
 
 async def try_await(value):
     if hasattr(value, '__await__'):
