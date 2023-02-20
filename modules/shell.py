@@ -23,5 +23,5 @@ async def run_shell(code):
 @dot  # dot module
 async def sh(code):
     text, returncode = await run_shell(code)
-    return text + (f"\n\nReturn code: {proc.returncode}" if proc.returncode != 0 else "")
+    return text + (f"\n\nReturn code: {returncode}" if returncode != 0 else "")
 
