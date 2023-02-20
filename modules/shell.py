@@ -10,7 +10,11 @@ import subprocess
 
 
 @dot  # dot module
-def sh(code):
-    proc = subprocess.run([os.getenv("SHELL") or "/bin/sh", "-c", code], encoding="utf-8", stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT)
-    return proc.stdout + (f"\n\nReturn code: {proc.returncode}" if proc.returncode != 0 else "")
+async def sh(code):
+    proc = await asyncio.create_subprocess_shell(
+        code,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT
+    )
+    stdout, _ = await proc.communicate()
+    return stdout.decode() + (f"\n\nReturn code: {proc.returncode}" if proc.returncode != 0 else "")
