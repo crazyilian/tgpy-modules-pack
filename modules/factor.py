@@ -11,12 +11,12 @@ import sympy
 
 
 async def factor_rho(n):
-    res = (await run_shell(f"factor {n}"))[0]
+    res = (await run_shell(f"factor {n}"))[0]  # shell module
     return list(map(int, res.partition(":")[2].split()))
 
 
 async def factor_ecm(n):
-    res = (await run_shell(f"echo {n} | ecm -q 3000000"))[0]
+    res = (await run_shell(f"echo {n} | ecm -q 3000000"))[0]  # shell module
     prefactors = list(map(int, res.split()))
     factors = []
     for prefactor in prefactors:
