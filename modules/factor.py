@@ -10,40 +10,40 @@ import subprocess
 import sympy
 
 
-def factor_rho(n):
-    res = subprocess.run(["factor", str(n)], capture_output=True)
-    return list(map(int, res.stdout.decode().partition(":")[2].split()))
+async def factor_rho(n):
+    res = await run_shell(f"factor {n}")[0]
+    return list(map(int, res.partition(":")[2].split()))
 
 
-def factor_ecm(n):
-    res = subprocess.run(["ecm", "-q", "3000000"], input=str(n).encode(), capture_output=True)
-    prefactors = list(map(int, res.stdout.decode().split()))
+async def factor_ecm(n):
+    res = await run_shell(f"echo {n} | ecm -q 3000000")
+    prefactors = list(map(int, res.split()))
     factors = []
     for prefactor in prefactors:
-        factors += factor(prefactor)
+        factors += await factor(prefactor)
     return factors
 
 
-def _factor(n):
+async def _factor(n):
     if sympy.isprime(n):
         return [n]
     if n < 10 ** 38:
-        return factor_rho(n)
-    return factor_ecm(n)
+        return await factor_rho(n)
+    return await factor_ecm(n)
 
 
 @dot  # dot module
-def factor(n):
-    return sorted(_factor(int(n)))
+async def factor(n):
+    return sorted(await _factor(int(n)))
 
 
 @dot  # dot module
-def factor_text(n):
+async def factor_text(n):
     n = int(n)
     if n == 1:
         return "1"
     by_power = defaultdict(int)
-    for x in factor(n):
+    for x in await factor(n):
         by_power[x] += 1
     return " × ".join(str(k) if v == 1 else str(k) + in_power_text(v) for k, v in by_power.items())
 
