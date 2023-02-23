@@ -11,7 +11,7 @@ import asyncio
 @dot_msg_handler  # dot_msg_handler module
 async def type(msg):
     await msg.delete()
-    text = msg.text[len('.type '):]
+    text = msg.text.removeprefix('.type ')
     chat = msg.chat_id
     rep = await msg.get_reply_message()
     message = await client.send_message(chat, '...', reply_to=rep)
