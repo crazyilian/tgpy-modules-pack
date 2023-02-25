@@ -104,4 +104,4 @@ async def sentiment():
     txt = msg.text
     res = model.predict([txt])[0]
     return '\n' + '\n'.join(map(lambda el: f'{el[1]}: {round(el[0], 7)}',
-                                filter(lambda el: el[0] > 0.00001, sorted(zip(res.values(), res.keys()), reverse=True))))
+                                filter(lambda el: el[0] > 0.0001, sorted(zip(res.values(), res.keys()), reverse=True))))
