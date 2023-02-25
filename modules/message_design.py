@@ -6,7 +6,7 @@
     save_locals: true
 """
 
-import tgpy.message_design
+import tgpy._core.message_design as message_design
 
-tgpy.message_design.TITLE = "$>"
-# tgpy.message_design.TITLE_URL = "https://crazyilian.ru"
+message_design.TITLE = "$>"
+

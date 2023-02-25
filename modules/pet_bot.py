@@ -16,7 +16,7 @@ PetBotConfig = UniversalModuleConfig('pet_bot', ['bot_token'], [str],
                                      default_dict={'session_filename': str(DATA_DIR / 'PetBot.session')})
 
 pet_bot = telethon.TelegramClient(
-    PetBotConfig.session_filename, app.config.api_id, app.config.api_hash
+    PetBotConfig.session_filename, app.client.api_id, app.client.api_hash
 )
 pet_bot.parse_mode = 'html'
 asyncio.create_task(pet_bot.start(bot_token=PetBotConfig.bot_token))

@@ -149,7 +149,7 @@ async def edit_loading(msg):
 
 @dot_msg_handler  # dot_msg_handler module
 async def pixiv(msg):
-    text: str = msg.raw_text.removeprefix('.pixiv ')
+    text: str = msg.raw_text[len('.pixiv '):]
     commands = list(filter(bool, '\n'.join(filter(lambda line: not line.startswith('>'), text.split('\n'))).split()))
     tree = {
         'stats': {

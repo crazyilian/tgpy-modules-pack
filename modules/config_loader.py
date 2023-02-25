@@ -9,7 +9,7 @@ import logging
 
 from tgpy.utils import DATA_DIR
 import yaml
-from tgpy.console import console
+from tgpy.main import console
 
 
 class UniversalModuleConfig:
