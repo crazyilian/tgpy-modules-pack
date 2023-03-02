@@ -1,17 +1,23 @@
 """
+    description: 'factorize numbers asynchronously'
     name: factor
+    needs:
+      shell: 0.0.0
+      try_await: 0.0.0
+    needs_pip: []
     once: false
-    origin: tgpy://module/factor
-    priority: 1674448904.86973
+    origin: tgpy://modules/factor
+    priority: 18
     save_locals: true
+    version: 0.0.0
+    wants: {}
 """
 from collections import defaultdict
-import subprocess
 import sympy
 
 
 async def factor_rho(n):
-    res = (await run_shell(f"factor {n}"))[0]  # shell module
+    res = (await run_shell(f"factor {n}"))[0]
     return list(map(int, res.partition(":")[2].split()))
 
 
@@ -32,21 +38,25 @@ async def _factor(n):
     return await factor_ecm(n)
 
 
-@dot  # dot module
 async def factor(n):
     return sorted(await _factor(int(n)))
 
 
-@dot  # dot module
-async def factor_text(n):
+@dot('factor')  # dot module
+async def factor_text(n=None):
+    if n is None:
+        return "No number to factor"
     n = int(n)
     if n == 1:
         return "1"
     by_power = defaultdict(int)
     for x in await factor(n):
         by_power[x] += 1
-    return " × ".join(str(k) if v == 1 else str(k) + in_power_text(v) for k, v in by_power.items())
+    return " × ".join(str(k) if v == 1 else str(k) + superscript(v) for k, v in by_power.items())
 
 
-def in_power_text(n):
+def superscript(n):
     return ("⁻" if n < 0 else "") + "".join("⁰¹²³⁴⁵⁶⁷⁸⁹"[int(c)] for c in str(abs(n)))
+
+
+__all__ = ['factor', 'factor_text']

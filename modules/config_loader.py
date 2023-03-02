@@ -2,65 +2,67 @@
     name: config_loader
     once: false
     origin: tgpy://module/config_loader
-    priority: 1001
+    priority: 9
     save_locals: true
+    description: "wrapper of tgpy.api.config for modules (default config, required values input)"
 """
+import tgpy.api
 import logging
 
-from tgpy.utils import DATA_DIR
-import yaml
-from tgpy.main import console
 
+class ModuleConfig:
+    module_name = None
+    logger = None
 
-class UniversalModuleConfig:
-    filename = None
-    config = {}
-
-    def __init__(self, module_name, required_keys=None, init_funcs=None, default_dict=None):
+    def __init__(self, module_name, required_keys=None, map_required_keys=None, default_dict=None):
         if required_keys is None:
             required_keys = []
-        if init_funcs is None:
-            init_funcs = [str] * len(required_keys)
+        if map_required_keys is None:
+            map_required_keys = [str] * len(required_keys)
         if default_dict is None:
             default_dict = {}
+        self.module_name = module_name
+        self.logger = logging.getLogger(f'config_loader.{module_name}')
 
-        self.filename = DATA_DIR / 'modules-config' / f'{module_name}_config.yml'
+        config = self.get_config()
 
-        self.load()
         correct_config = True
-        for key, func in zip(required_keys, init_funcs):
-            if key not in self.config:
+        for key, func in zip(required_keys, map_required_keys):
+            if key not in config:
                 if correct_config:
                     correct_config = False
                     pretty_name = module_name.replace("_", " ").title()
-                    console.print(f'[magenta bold] "{pretty_name}" module configuration is incomplete.')
-                self.config[key] = func(console.input(f'│ Please enter "{key}": '))
+                    self.logger.info(f'"{pretty_name}" module configuration is incomplete.')
+                self.logger.info(f'│ Please enter "{key}":')
+                config[key] = func(input())
         if not correct_config:
-            console.print("| Configuration completed.")
+            self.logger.info("| Configuration completed.")
 
         for key in default_dict:
-            if key not in self.config:
-                self.config[key] = default_dict[key]
-        self.save()
+            if key not in config:
+                config[key] = default_dict[key]
+        self.save(config)
 
-    def save(self):
-        with open(self.filename, 'w') as file:
-            yaml.safe_dump(self.config, file)
+    def save(self, config=None):
+        if config is None:
+            tgpy.api.config.save()
+        else:
+            tgpy.api.config.set(f'config_loader.{self.module_name}', config)
 
-    def load(self):
-        try:
-            with open(self.filename) as file:
-                self.config = yaml.safe_load(file)
-        except FileNotFoundError:
-            self.config = {}
+    def get_config(self):
+        return tgpy.api.config.get(f'config_loader.{self.module_name}', {})
+
+    def __getitem__(self, item):
+        return tgpy.api.config.get(f'config_loader.{self.module_name}.{item}')
+
+    def __setitem__(self, key, value):
+        return tgpy.api.config.set(f'config_loader.{self.module_name}.{key}', value)
 
     def __getattr__(self, item):
-        # logging.info(f"getattr {item}")
-        return self.config[item]
+        return self[item]
 
     def __setattr__(self, key, value):
-        if hasattr(self, key):
-            super(UniversalModuleConfig, self).__setattr__(key, value)
+        if key in dir(self):
+            super(ModuleConfig, self).__setattr__(key, value)
         else:
-            # logging.info(f"setattr {key}: {value}")
-            self.config[key] = value
+            self[key] = value

@@ -2,10 +2,10 @@
     name: try_await
     once: false
     origin: tgpy://module/try_await
-    priority: 10
+    priority: 3
     save_locals: true
+    description: make sync function async & wrapper with same syntax for sync and async functions
 """
-
 import asyncio
 import concurrent.futures
 

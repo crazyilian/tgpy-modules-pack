@@ -1,19 +1,22 @@
 """
+    description: ''
     name: pipdep
+    needs: {}
+    needs_pip: []
     once: false
-    origin: tgpy://module/pipdep
+    origin: https://t.me/tgpy_flood/10012
     priority: 1
     save_locals: true
+    version: 0.0.0
+    wants: {}
 """
 import ast
 import importlib
 import subprocess
 import sys
 
-
 def install_pip_package(name):
     subprocess.run([sys.executable, "-m", "pip", "install", name], check=True)
-
 
 dep_names = set()
 for module in modules:

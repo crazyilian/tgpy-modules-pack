@@ -2,9 +2,9 @@
     name: mood
     once: false
     origin: tgpy://module/mood
-    priority: 1677334897
+    priority: 23
+    description: get most positive and negative messages in chat & get mood of one message
 """
-import telethon.tl.types
 from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
 from datetime import datetime
@@ -105,3 +105,6 @@ async def sentiment():
     res = model.predict([txt])[0]
     return '\n' + '\n'.join(map(lambda el: f'{el[1]}: {round(el[0], 7)}',
                                 filter(lambda el: el[0] > 0.0001, sorted(zip(res.values(), res.keys()), reverse=True))))
+
+
+__all__ = ['sentiment', 'topmood', 'topmoodcnt']

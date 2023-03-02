@@ -1,9 +1,16 @@
 """
     name: channel_join_requests
+    needs:
+      config_loader: 0.0.0
+      cron: 0.0.0
+      pet_bot: 0.0.0
+      tg_name: 0.0.0
     once: false
     origin: tgpy://module/channel_join_requests
-    priority: 1673128541.938998
+    priority: 14
     save_locals: true
+    version: 0.0.0
+    description: "track pending join requests in target channels"
 """
 import telethon
 
@@ -49,10 +56,10 @@ class OneChannelJoinRequests:
 class ChannelJoinRequestsModule:
     def __init__(self):
         # config_loader module
-        self.config = UniversalModuleConfig('channel_join_requests',
-                                            default_dict={'channel_ids': [], 'requesters': {}})
+        self.config = ModuleConfig('channel_join_requests',
+                                   default_dict={'channel_ids': [], 'requesters': {}})
         self.channels = [OneChannelJoinRequests(id, self) for id in self.config.channel_ids]
-        cron_add_job(self.update, "0 * * * *")  # cron module
+        cron_add_job(self.update, "0 * * * *")
 
     def get_requesters(self):
         result = {}
@@ -94,8 +101,10 @@ class ChannelJoinRequestsModule:
                 notify_message = f'New joining requests in channel "{channel.name}"'
                 for user in new_users:
                     user = await client.get_entity(user)  # fix user.username == None
-                    notify_message += f'\n' + get_name(user)  # mention_all module
-                await notify(notify_message)  # pet_bot module
+                    notify_message += f'\n' + get_name(user)
+                await pet_bot.notify(notify_message)
 
 
 channel_join_requests = ChannelJoinRequestsModule()
+
+__all__ = ['channel_join_requests']

@@ -1,9 +1,14 @@
 """
     name: track_last_seen
+    needs:
+      config_loader: 0.0.0
+      pet_bot: 0.0.0
+      tg_name: 0.0.0
     once: false
     origin: tgpy://module/track_last_seen
-    priority: 1676485859.4033725
+    priority: 22
     save_locals: true
+    description: notify when target users go online or offline
 """
 import telethon
 import asyncio
@@ -12,8 +17,8 @@ import asyncio
 class TrackLastSeenModule:
     def __init__(self):
         # config_loader module
-        self.config = UniversalModuleConfig('track_last_seen', ['notify_chat_id'], [int],
-                                            default_dict={'watches': {}})  # config_loader module
+        self.config = ModuleConfig('track_last_seen', ['notify_chat_id'], [int],
+                                   default_dict={'watches': {}})
         self.handlers = []
         asyncio.create_task(self.add(*self.config.watches.keys()))
 
@@ -24,7 +29,7 @@ class TrackLastSeenModule:
                 res[ent] = self.config.watches[ent]
             else:
                 user = await client.get_entity(ent)
-                res[user.id] = get_name(user)  # mention_all module
+                res[user.id] = get_name(user)
         return res
 
     async def add(self, *entities):
@@ -49,7 +54,7 @@ class TrackLastSeenModule:
                 text = f'{name} disconnected'
             else:
                 text = f'{name} {event.status.__class__.__name__}'
-            await notify(text, chat_id=self.config.notify_chat_id)  # pet_bot module
+            await pet_bot.notify(text, chat_id=self.config.notify_chat_id)
 
     async def remove(self, *entities):
         id_name = await self.get_id_name_by_entities(entities)
@@ -62,3 +67,5 @@ class TrackLastSeenModule:
 
 
 track_last_seen = TrackLastSeenModule()
+
+__all__ = ['track_last_seen']

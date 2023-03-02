@@ -1,15 +1,21 @@
 """
+    description: 'call function with schedule by cron'
     name: cron
+    needs: {}
+    needs_pip: []
     once: false
     origin: tgpy://module/cron
-    priority: 1001
+    priority: 8
     save_locals: true
+    version: 0.0.0
+    wants: {}
 """
-
 import asyncio
 import datetime
 import logging
 from croniter import croniter
+
+logger = logging.getLogger(__name__)
 
 TZ_MOSCOW = datetime.timezone(datetime.timedelta(hours=3))
 
@@ -31,7 +37,7 @@ async def cron_work():
         now = datetime.datetime.now(TZ_MOSCOW)
         for [func, cron] in cron_jobs:
             if croniter.match(cron, now):
-                logging.info(f"running {func}")
+                logger.info(f"running {func}")
                 if asyncio.iscoroutinefunction(func):
                     asyncio.create_task(func())
                 else:
@@ -44,7 +50,7 @@ async def cron_work():
         if sleep_until is None:
             break
         sleep_time = (sleep_until - now).total_seconds()
-        logging.info(f"sleeping for {sleep_time} seconds")
+        logger.info(f"sleeping for {sleep_time} seconds")
         await asyncio.sleep(sleep_time)
 
 
@@ -56,3 +62,6 @@ def cron_start_working():
 def cron_stop_working():
     nonlocal cron_task
     cron_task.cancel()
+
+
+__all__ = ['cron_add_job']

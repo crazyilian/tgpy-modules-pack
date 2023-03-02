@@ -1,31 +1,19 @@
 """
+    description: 'mention all users in chat'
     name: mention_all
+    needs:
+      tg_name: 0.0.0
+    needs_pip: []
     once: false
     origin: tgpy://module/mention_all
-    priority: 10001
+    priority: 12
     save_locals: true
+    version: 0.0.0
+    wants: {}
 """
-
-
-def get_name(user, try_username=True):
-    if try_username and user.username:
-        return '@' + user.username
-    return f'<a href="tg://user?id={user.id}">{user.first_name}</a>'
-
-
-@dot_msg_handler  # dot_msg_handler module
-async def mention_all_names(msg):
-    users = filter(lambda x: not x.bot, await client.get_participants(msg.chat_id))
-    names = list(map(lambda u: get_name(u, False), users))
-    for i in range(0, len(names), 5):
-        await client.send_message(msg.chat_id, '\n'.join(names[i:i + 5]))
-    await msg.delete()
-
-
-@dot_msg_handler  # dot_msg_handler module
-async def mention_all(msg):
-    users = filter(lambda x: not x.bot, await client.get_participants(msg.chat_id))
+async def mention_all():
+    users = filter(lambda x: not x.bot, await client.get_participants(ctx.msg.chat_id))
     names = list(map(lambda u: get_name(u, True), users))
     for i in range(0, len(names), 5):
-        await client.send_message(msg.chat_id, '\n'.join(names[i:i + 5]))
-    await msg.delete()
+        await client.send_message(ctx.msg.chat_id, '\n'.join(names[i:i + 5]))
+    await ctx.msg.delete()

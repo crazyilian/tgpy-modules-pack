@@ -1,8 +1,8 @@
 """
     name: uptime
     once: false
-    origin: tgpy://module/uptime
-    priority: 1674328542.263713
+    origin: https://t.me/tgpy_flood/6513
+    priority: 15
     save_locals: true
 """
 from datetime import datetime

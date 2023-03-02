@@ -1,14 +1,13 @@
 """
     name: expand
+    needs:
+      shell: 0.0.0
     once: false
     origin: tgpy://module/expand
-    priority: 1000
+    priority: 7
     save_locals: true
+    description: expand strings via bash printf (e.g. "{1..3}" -> ['1', '2', '3'])
 """
-import subprocess
-
-
 def expand(s):
-    stdout = subprocess.run(["bash", "-c", f"printf '%s\n' {s}"], capture_output=True, check=True,
-                            encoding="utf-8").stdout
+    stdout = run_sync_shell(["bash", "-c", f"printf '%s\n' {s}"])[0]
     return stdout.splitlines()

@@ -1,17 +1,23 @@
 """
     name: pixiv
+    needs:
+      config_loader: 0.0.0
+      dot: 0.2.0
+      try_await: 0.0.0
     once: false
     origin: tgpy://module/pixiv
-    priority: 1675890236
+    priority: 20
     save_locals: false
+    description: get stats of logged in pixiv user
 """
-
 import pixivpy_async
 import asyncio
 import random
 import time
 
 import logging
+
+logger = logging.getLogger(__name__)
 
 REQUEST_ATTEMPTS = 3
 ACCESS_TOKEN_TIMEOUT = 60 * 60 - 5
@@ -30,7 +36,7 @@ class AutoLoginAPI:
 
     def __getattr__(self, item):
         api_item = self.api.__getattribute__(item)
-        logging.info('get api attr: ' + str(item))
+        logger.info('get api attr: ' + str(item))
         if not asyncio.iscoroutinefunction(api_item):
             return api_item
 
@@ -47,8 +53,8 @@ class AutoLoginAPI:
                 try:
                     return await api_item(*args, **kwargs)
                 except (pixivpy_async.error.NoTokenError, pixivpy_async.error.NoLoginError) as e:
-                    logging.error('Error while calling ' + str(item))
-                    logging.error(e)
+                    logger.error('Error while calling ' + str(item))
+                    logger.error(e)
                     await self.login()
                     await randSleep()
             raise e
@@ -59,12 +65,19 @@ class AutoLoginAPI:
         return time.time() - self.last_login > ACCESS_TOKEN_TIMEOUT
 
     async def login(self):
-        logging.info('logging in...')
+        logger.info('logging in...')
         await self.api.login(refresh_token=self.REFRESH_TOKEN)
         self.last_login = time.time()
 
 
 class PixivUser:
+    """
+        use with dot:
+        .pixiv = .pixiv stats
+        .pixiv stats = .pixiv stats partial
+        .pixiv stats partial - get total illusts, views, bookmarks and followers
+        .pixiv status full - partial + max views and bookmarks
+    """
 
     def __init__(self, user_id, refresh_token=None):
         self.USER_ID = user_id
@@ -139,23 +152,18 @@ class PixivUser:
         return message
 
 
-async def edit_unknown_command(msg):
-    return await msg.edit(msg.text + '\n<code>&gt; Unknown pixiv module command</code>')
-
-
-async def edit_loading(msg):
-    return await msg.edit(msg.text + '\n<code>&gt; Loading...</code>')
-
-
-@dot_msg_handler  # dot_msg_handler module
-async def pixiv(msg):
-    text: str = msg.raw_text[len('.pixiv '):]
+@dot('pixiv')
+async def pixiv_dot_handler(text=''):
     commands = list(filter(bool, '\n'.join(filter(lambda line: not line.startswith('>'), text.split('\n'))).split()))
     tree = {
         'stats': {
-            'partial': (user.text_stats, [['Total illusts', 'Total views', 'Total bookmarks', 'Total followers']]),
-            'full': (user.text_stats, [['Total illusts', 'Total views', 'Total bookmarks', 'Max views', 'Max bookmarks',
-                                        'Total followers']])
+            'partial': (
+                pixiv_user.text_stats, [['Total illusts', 'Total views', 'Total bookmarks', 'Total followers']]
+            ),
+            'full': (
+                pixiv_user.text_stats,
+                [['Total illusts', 'Total views', 'Total bookmarks', 'Max views', 'Max bookmarks', 'Total followers']]
+            )
         }
     }
     tree['stats'][''] = tree['stats']['partial']
@@ -170,14 +178,16 @@ async def pixiv(msg):
         tree = tree.get(c)
         if tree is not None:
             continue
-        return await edit_unknown_command(msg)
+        return "Unknown command"
 
     if isinstance(tree, dict):
-        return await edit_unknown_command(msg)
-    await edit_loading(msg)
-    ans = await try_await(tree[0](*tree[1]))  # try_await module
-    await msg.edit(ans)
+        return "Unknown command"
+    ctx.is_manual_output = True
+    ans = await try_await(tree[0](*tree[1]))
+    await ctx.msg.edit(ans)
 
 
-config = UniversalModuleConfig('pixiv', ('user_id', 'refresh_token'))  # config_loader module
-user = PixivUser(config.user_id, config.refresh_token)
+config = ModuleConfig('pixiv', ('user_id', 'refresh_token'))
+pixiv_user = PixivUser(config.user_id, config.refresh_token)
+
+__all__ = ['pixiv_user', 'PixivUser']

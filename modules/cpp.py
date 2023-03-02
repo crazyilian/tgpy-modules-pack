@@ -1,16 +1,22 @@
 """
+    description: 'run cpp code'
     name: cpp
+    needs:
+      dot: 0.1.0
+    needs_pip: []
     once: false
     origin: tgpy://module/cpp
-    priority: 10001
+    priority: 13
     save_locals: true
+    version: 0.0.0
+    wants: {}
 """
 import asyncio
 import subprocess
 
 
-@dot  # dot module
-async def cpp(cmd):
+@dot('cpp')
+async def cpp(cmd=''):
     with open("/tmp/tmp.cpp", "w") as out:
         out.write(cmd)
 
