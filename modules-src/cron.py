@@ -3,7 +3,7 @@
     name: cron
     needs_pip:
     - croniter
-    version: 0.0.4
+    version: 0.0.5
 """
 import asyncio
 import datetime
