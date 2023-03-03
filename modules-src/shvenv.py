@@ -4,7 +4,7 @@
     needs:
       dot: 0.1.0
       shell: 0.1.0
-    version: 0.0.0
+    version: 0.1.0
 """
 
 import sys
@@ -18,5 +18,5 @@ def in_virtualenv():
 async def shvenv(code=''):
     if not in_virtualenv():
         return "No virtualenv found"
-    text, returncode = await run_shell(f'export PATH="{sys.prefix}:$PATH" ; {code}')
+    text, returncode = await run_shell(f'export PATH="{sys.prefix}/bin:$PATH" ; {code}')
     return text + (f"\n\nReturn code: {returncode}" if returncode != 0 else "")
