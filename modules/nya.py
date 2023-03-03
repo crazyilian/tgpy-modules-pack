@@ -2,69 +2,63 @@
     description: nya, the best module manager of tgpy
     name: nya
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://gist.github.com/miralushch/b43ce0642f89814981f341308ba9dac9
     priority: 0
-    version: 0.28.0
+    version: 0.32.6
     wants: {}
 """
+from tgpy.modules import get_user_modules, get_module_names, delete_module_file, Module
+import aiohttp
+from enum import Enum
+from pathlib import Path
+import io
+from typing import Tuple, Dict, List, Set, Callable, Awaitable, Union, TypeAlias
+from types import ModuleType
+from urllib.parse import urlparse
+from datetime import datetime
+import tgpy.api
+from telethon.errors.rpcerrorlist import MessageTooLongError
+from telethon.tl.types import MessageEntityCode
+import yaml
+import gzip
 import subprocess
 import sys
+
+
+def pip_install(lib: str, piplib: str | None = None, output: List[str] | None = None) -> ModuleType:
+    try:
+        return __import__(lib)
+    except ImportError:
+        subprocess.run([sys.executable, "-m", "pip",
+                        "install", piplib or lib], check=True)
+        if output is not None:
+            output.append(f"installed pip module {piplib}")
+        return __import__(lib)
+
+
+zstd = pip_install('zstd')
+brotli = pip_install('brotli')
+base65536 = pip_install('base65536')
+VersionInfo: TypeAlias = pip_install(  # type: ignore [valid-type]
+    'semver').VersionInfo
+python_minifier = pip_install('python_minifier', 'python-minifier')
+gists = pip_install('gists', 'gists.py')
+
+
 try:
-    from tgpy.message_design import get_code # type: ignore [import]
+    from tgpy.message_design import get_code
 except ImportError:
-    from tgpy.message_design import parse_message # type: ignore [import]
+    from tgpy.message_design import parse_message
+
     def get_code(message):
         return parse_message(message).code
-import gzip
-try:
-    import zstd # type: ignore [import]
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "zstd"], check=True)
-    import zstd # type: ignore [import]
-try:
-    import brotli # type: ignore [import]
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "brotli"], check=True)
-    import brotli # type: ignore [import]
-import yaml
-import base65536 # type: ignore [import]
-try:
-    import base65536 # type: ignore [import]
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "base65536"], check=True)
-    import base65536 # type: ignore [import]
-from telethon.tl.types import MessageEntityCode # type: ignore [import]
-from telethon.errors.rpcerrorlist import MessageTooLongError # type: ignore [import]
-import tgpy.api # type: ignore [import]
-from datetime import datetime
-try:
-    from semver import VersionInfo # type: ignore [import]
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "semver"], check=True)
-    from semver import VersionInfo # type: ignore [import]
-from urllib.parse import urlparse
-try:
-    import python_minifier
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "python-minifier"], check=True)
-    import python_minifier
-from typing import Tuple, Dict, List, Set, Callable, Awaitable, Union
-import io
-from pathlib import Path
-from enum import Enum
-try:
-    import gists # type: ignore [import]
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "gists.py"], check=True)
-    import gists # type: ignore [import]
-import aiohttp
-from tgpy.modules import Module, delete_module_file, get_module_names, get_user_modules # type: ignore [import]
+
 
 class DependencyException(Exception):
     """Exception raised when a dependency is not satisfied
-    
+
     Attributes:
         name: the name of the dependency
         version: the version of the dependency; None if the dependency is not found
@@ -91,7 +85,8 @@ class Nya:
             chat, id = source.path[1:].split("/", 2)[-2:]
             if source.path[1] == "c":
                 chat = int("-100" + chat)
-            orig = await client.get_messages(chat, ids=int(id)) # type: ignore [name-defined]
+            orig = await client.get_messages(  # type: ignore [name-defined]
+                chat, ids=int(id))
             if orig.media is not None:
                 f = io.BytesIO()
                 await orig.download_media(f)
@@ -101,9 +96,11 @@ class Nya:
                 text = get_code(orig) or orig.raw_text
             return text
         self.__gist_client = gists.Client()
+
         async def gist_handler(src: str) -> str:
             return (await self.__gist_client.get_gist(src.split("/")[-1])).files[0].content
         self.__aiohttp_session = aiohttp.ClientSession()
+
         async def plain_text_handler(src: str) -> str:
             return await (await self.__aiohttp_session.get(src)).text()
         self.__source_handlers: Dict[Tuple[str, str], Callable[[str], Awaitable[str]]] = {
@@ -160,22 +157,85 @@ class Nya:
             return code
 
     def __check_dep(self, name: str, version: str, dep: str, dep_version: str):
-        if dep in modules: # type: ignore [name-defined]
-            dep_module = modules[dep] # type: ignore [name-defined]
-            curr_dep_version = VersionInfo.parse(dep_module.extra["version"]) if "version" in dep_module.extra else VersionInfo.parse("0.0.0")
+        if dep in modules:  # type: ignore [name-defined]
+            dep_module = modules[dep]  # type: ignore [name-defined]
+            curr_dep_version = VersionInfo.parse(
+                dep_module.extra["version"]) if "version" in dep_module.extra else VersionInfo.parse("0.0.0")
             dep_version_parsed = VersionInfo.parse(dep_version)
             if curr_dep_version < dep_version_parsed or dep_version_parsed >= curr_dep_version.bump_major():
-                raise DependencyException(dep, str(curr_dep_version), f"module {name} {version} needs module {dep} ^{dep_version}, but {dep} {curr_dep_version} found")
+                raise DependencyException(dep, str(
+                    curr_dep_version), f"module {name} {version} needs module {dep} ^{dep_version}, but {dep} {curr_dep_version} found")
         else:
-            raise DependencyException(dep, None, f"module {name} {version} needs module {dep} ^{dep_version}, but no {dep} found")
-    
+            raise DependencyException(
+                dep, None, f"module {name} {version} needs module {dep} ^{dep_version}, but no {dep} found")
+
+    def __parse(self, text: str) -> Tuple[str, VersionInfo, str, Dict[str, str], Dict[str, str], Dict[str, str], str]:
+        assert '"""' in text
+        header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
+        name = header["name"]
+        version = VersionInfo.parse(
+            header["version"] if "version" in header else "0.0.0")
+        description = header["description"] if "description" in header else ""
+        needs = header["needs"] if "needs" in header else dict()
+        wants = header["wants"] if "wants" in header else dict()
+        needs_pip = header["needs_pip"] if "needs_pip" in header else dict()
+        code = self.__decode_code(text.split('"""', 2)[2].strip("\n"))
+        return name, version, description, needs, wants, needs_pip, code
+
+    def __print_info(self, name: str, version: VersionInfo, description: str, needs: Dict[str, str], wants: Dict[str, str], needs_pip: Dict[str, str]):
+        print(f"{name} {version} ({description})")
+        if needs:
+            print("needs:")
+            for dep in needs:
+                print(f"    {dep}: {needs[dep]}")
+        if wants:
+            print("wants:")
+            for dep in wants:
+                try:
+                    self.__check_dep(name, version, dep, wants[dep])
+                    print(f"    {dep}: {wants[dep]}")
+                except DependencyException as e:
+                    if e.version is None:
+                        print(f"    {dep}: {wants[dep]} not satisfied")
+        if needs_pip:
+            print("needs_pip:")
+            for dep in needs_pip:
+                print(f"- {dep}")
+
+    def __check_deps(self, name: str, version: VersionInfo, needs: Dict[str, str], wants: Dict[str, str], needs_pip: Dict[str, str], output: List[str]):
+        for dep, ver in needs.items():
+            try:
+                self.__check_dep(name, version, dep, ver)
+            except DependencyException as e:
+                print(*output, sep="\n")
+                self.regraph()
+                raise e
+        for dep, ver in wants.items():
+            try:
+                self.__check_dep(name, str(version), dep, ver)
+            except DependencyException as e:
+                if e.version:
+                    print(*output, sep="\n")
+                    self.regraph()
+                    raise e
+        for dep, pip in needs_pip.items():
+            pip_install(dep, pip, output)
+
+    async def __run(self, name: str, version: VersionInfo, code: str, output: List[str]):
+        try:
+            await tgpy.api.tgpy_eval(code)
+            output.append(f"ran module {name} {version}")
+        except:
+            output.append(f"failed to run module {name} {version}")
+
     def __regraph_rec(self, name: str, ordered: List[str], visited: Set[str], visiting: Set[str], deleted: Set[str]):
         if name == "nya" or name in visited or name in deleted:
             return
-        module = modules[name] # type: ignore [name-defined]
-        version = VersionInfo.parse(module.extra["version"]) if "version" in module.extra else VersionInfo.parse("0.0.0")
+        module = modules[name]  # type: ignore [name-defined]
+        version = VersionInfo.parse(
+            module.extra["version"]) if "version" in module.extra else VersionInfo.parse("0.0.0")
         is_invalid = False
-        module = modules[name] # type: ignore [name-defined]
+        module = modules[name]  # type: ignore [name-defined]
         needs = module.extra["needs"] if "needs" in module.extra else dict()
         wants = module.extra["wants"] if "wants" in module.extra else dict()
         visiting.add(name)
@@ -185,15 +245,19 @@ class Nya:
             except DependencyException as e:
                 is_invalid = True
                 if e.version:
-                    print(f"module {name} {version} needs module {dep} ^{needs[dep]}, but {dep} {e.version} found")
+                    print(
+                        f"module {name} {version} needs module {dep} ^{needs[dep]}, but {dep} {e.version} found")
                 else:
-                    print(f"module {name} {version} needs module {dep} ^{needs[dep]}, but no {dep} found")
+                    print(
+                        f"module {name} {version} needs module {dep} ^{needs[dep]}, but no {dep} found")
                     continue
             if dep in visiting:
                 for dep2 in visiting:
-                    dep2_module = modules[dep2] # type: ignore [name-defined]
-                    dep2_needs = dep2_module.extra["needs"] if "needs" in dep2_module.extra else dict()
-                    dep2_wants = dep2_module.extra["wants"] if "wants" in dep2_module.extra else dict()
+                    dep2_module = modules[dep2]  # type: ignore [name-defined]
+                    dep2_needs = dep2_module.extra["needs"] if "needs" in dep2_module.extra else dict(
+                    )
+                    dep2_wants = dep2_module.extra["wants"] if "wants" in dep2_module.extra else dict(
+                    )
                     if dep in dep2_needs or dep in dep2_wants:
                         print(f"DEPENDENCY CYCLE: {dep} <-> {dep2}")
                         break
@@ -205,24 +269,29 @@ class Nya:
                 self.__check_dep(name, version, dep, needs[dep])
             except DependencyException as e:
                 if e.version and not is_invalid:
-                    print(f"module {name} {version} needs module {dep} ^{needs[dep]}, but {dep} {e.version} found")
+                    print(
+                        f"module {name} {version} needs module {dep} ^{needs[dep]}, but {dep} {e.version} found")
                 else:
-                    print(f"module {name} {version} needs module {dep} ^{needs[dep]}, but no {dep} found")
+                    print(
+                        f"module {name} {version} needs module {dep} ^{needs[dep]}, but no {dep} found")
                 is_invalid = True
         for dep in wants:
             try:
                 self.__check_dep(name, version, dep, wants[dep])
             except DependencyException as e:
                 if e.version:
-                    print(f"module {name} {version} wants module {dep} ^{wants[dep]}, but {dep} {e.version} found")
+                    print(
+                        f"module {name} {version} wants module {dep} ^{wants[dep]}, but {dep} {e.version} found")
                     is_invalid = True
                 else:
                     continue
             if dep in visiting:
                 for dep2 in visiting:
-                    dep2_module = modules[dep2] # type: ignore [name-defined]
-                    dep2_needs = dep2_module.extra["needs"] if "needs" in dep2_module.extra else dict()
-                    dep2_wants = dep2_module.extra["wants"] if "wants" in dep2_module.extra else dict()
+                    dep2_module = modules[dep2]  # type: ignore [name-defined]
+                    dep2_needs = dep2_module.extra["needs"] if "needs" in dep2_module.extra else dict(
+                    )
+                    dep2_wants = dep2_module.extra["wants"] if "wants" in dep2_module.extra else dict(
+                    )
                     if dep in dep2_needs or dep in dep2_wants:
                         print(f"DEPENDENCY CYCLE: {dep} <-> {dep2}")
                         break
@@ -234,7 +303,8 @@ class Nya:
                 self.__check_dep(name, version, dep, wants[dep])
             except DependencyException as e:
                 if e.version and not is_invalid:
-                    print(f"module {name} {version} wants module {dep} ^{wants[dep]}, but {dep} {e.version} found")
+                    print(
+                        f"module {name} {version} wants module {dep} ^{wants[dep]}, but {dep} {e.version} found")
                     is_invalid = True
         visiting.discard(name)
         if is_invalid:
@@ -245,11 +315,14 @@ class Nya:
             visited.add(name)
 
     def regraph(self):
+        visited: Set[str]
+        visiting: Set[str]
+        deleted: Set[str]
         ordered, visited, visiting, deleted = ["nya"], set(), set(), set()
-        for name in modules:
+        for name in modules:  # type: ignore [name-defined]
             self.__regraph_rec(name, ordered, visited, visiting, deleted)
         for i, name in enumerate(ordered):
-            module = modules[name]
+            module = modules[name]  # type: ignore [name-defined]
             module.priority = i
             module.save()
 
@@ -260,38 +333,16 @@ class Nya:
     async def install(self, origin: str, text: str, force: bool = False):
         """install module from provided {origin} and {text}; if {force} is True version will be ignored"""
         output: List[str] = []
-        assert '"""' in text
-        header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
-        name = header["name"]
-        version = header["version"] if "version" in header else "0.0.0"
-        description = header["description"] if "description" in header else ""
-        needs = header["needs"] if "needs" in header else dict()
-        wants = header["wants"] if "wants" in header else dict()
-        needs_pip = header["needs_pip"] if "needs_pip" in header else []
-        code = self.__decode_code(text.split('"""', 2)[2].strip("\n"))
-        if name in modules: # type: ignore [name-defined]
-            module = modules[name] # type: ignore [name-defined]
-            current_version = VersionInfo.parse(module.extra["version"]) if "version" in module.extra else VersionInfo.parse("0.0.0")
-            if current_version < VersionInfo.parse(version) or version == "0.0.0" or force:
+        name, version, description, needs, wants, needs_pip, code = self.__parse(
+            text)
+        if name in modules:  # type: ignore [name-defined]
+            module = modules[name]  # type: ignore [name-defined]
+            current_version = VersionInfo.parse(
+                module.extra["version"]) if "version" in module.extra else VersionInfo.parse("0.0.0")
+            if current_version < version or version == "0.0.0" or force:
                 self.set_source(name, origin)
-                for dep in needs:
-                    try:
-                        self.__check_dep(name, version, dep, needs[dep])
-                    except DependencyException as e:
-                        print(*output, sep="\n")
-                        self.regraph()
-                        raise e
-                for dep in wants:
-                    try:
-                        self.__check_dep(name, str(version), dep, wants[dep])
-                    except DependencyException as e:
-                        if e.version:
-                            print(*output, sep="\n")
-                            self.regraph()
-                            raise e
-                for dep in needs_pip:
-                    subprocess.run([sys.executable, "-m", "pip", "install", dep], check=True)
-                    output.append(f"installed pip module {dep}")
+                self.__check_deps(name, version, needs,
+                                  wants, needs_pip, output)
                 module.code = code
                 module.origin = origin
                 module.extra["version"] = str(version)
@@ -300,34 +351,14 @@ class Nya:
                 module.extra["wants"] = wants
                 module.extra["needs_pip"] = needs_pip
                 module.save()
-                output.append(f"updated module {name}: {current_version} -> {version}")
-                try:
-                    await tgpy.api.tgpy_eval(code)
-                    output.append(f"ran module {name} {version}")
-                except:
-                    output.append(f"failed to run module {name} {version}")
+                output.append(
+                    f"updated module {name}: {current_version} -> {version}")
+                await self.__run(name, version, code, output)
             else:
                 output.append(f"module {name} is already up to date")
         else:
             self.set_source(name, origin)
-            for dep in needs:
-                try:
-                    self.__check_dep(name, str(version), dep, needs[dep])
-                except DependencyException as e:
-                    print(*output, sep="\n")
-                    self.regraph()
-                    raise e
-            for dep in wants:
-                try:
-                    self.__check_dep(name, str(version), dep, wants[dep])
-                except DependencyException as e:
-                    if e.version:
-                        print(*output, sep="\n")
-                        self.regraph()
-                        raise e
-            for dep in needs_pip:
-                subprocess.run([sys.executable, "-m", "pip", "install", dep], check=True)
-                output.append(f"installed pip module {dep}")
+            self.__check_deps(name, version, needs, wants, needs_pip, output)
             module = Module(
                 name=name,
                 once=False,
@@ -347,18 +378,14 @@ class Nya:
             tgpy.api.config.set("nya.last_installed", name)
             tgpy.api.config.save()
             output.append(f"saved the name of last installed module: {name}")
-            try:
-                await tgpy.api.tgpy_eval(code)
-                output.append(f"ran module {name} {version}")
-            except:
-                output.append(f"failed to run module {name} {version}")
+            await self.__run(name, version, code, output)
         print(*output, sep="\n")
         self.regraph()
 
-    async def reg_install(self, name: str):
+    async def reg_install(self, name: str, force: bool = False):
         """install the module {name} using registry"""
         src = tgpy.api.config.get("registry")[name]
-        await self.dep_install(src, await self.__get_from(src))
+        await self.dep_install(src, await self.__get_from(src), force)
 
     async def dep_install(self, origin: str, text: str, force: bool = False, last_tried: str | None = None):
         """install the module {name} using registry"""
@@ -374,7 +401,7 @@ class Nya:
     async def update(self):
         """update all installed modules using registry"""
         for name in self.__iter_registry():
-            if name in modules:
+            if name in modules:  # type: ignore [name-defined]
                 await self.reg_install(name)
         await tgpy.api.tgpy_eval("")
         self.regraph()
@@ -390,12 +417,20 @@ class Nya:
 
     async def share_registry(self):
         """share the list of available modules; can be imported through nya.import_from_reply()"""
-        ans = '"""\n    sources:\n' + "\n".join([f"        {name}: \"{tgpy.api.config.get('registry')[name]}\"" for name in list(self.__iter_registry())]) + '\n"""'
-        await ctx.msg.respond(ans, formatting_entities=[MessageEntityCode(0, len(ans.encode('utf-16-le')) // 2)])
+        ans = '"""\n    sources:\n' + \
+            "\n".join([f"        {name}: \"{tgpy.api.config.get('registry')[name]}\"" for name in list(
+                self.__iter_registry())]) + '\n"""'
+        await ctx.msg.respond(ans, formatting_entities=[MessageEntityCode(0, len(ans.encode('utf-16-le')) // 2)])  # type: ignore [name-defined]
 
-    def set_source(self, name: str, source: str):
+    def set_source(self, name: str, source: str, overwrite: bool = True):
         """set the source {source} of module {name} to the registry"""
-        tgpy.api.config.set(f"registry.{name}", source)
+        if overwrite or name not in tgpy.api.config.get(f"registry"):
+            tgpy.api.config.set(f"registry.{name}", source)
+            tgpy.api.config.save()
+
+    def remove_source(self, name: str):
+        """remove the source of module {name} from the registry"""
+        tgpy.api.config.unset(f"registry.{name}")
         tgpy.api.config.save()
 
     def get_source(self, name: str) -> str:
@@ -404,12 +439,14 @@ class Nya:
 
     async def share_sources(self, names: List[str]):
         """share the sources of modules listed in {names} from the registry; can be imported through nya.import_from_reply()"""
-        ans = '"""\n    sources:\n' + "\n".join([f"        {name}: \"{tgpy.api.config.get('registry')[name]}\"" for name in names]) + '\n"""'
-        await ctx.msg.respond(ans, formatting_entities=[MessageEntityCode(0, len(ans.encode('utf-16-le')) // 2)]) # type: ignore [name-defined]
+        ans = '"""\n    sources:\n' + \
+            "\n".join(
+                [f"        {name}: \"{tgpy.api.config.get('registry')[name]}\"" for name in names]) + '\n"""'
+        await ctx.msg.respond(ans, formatting_entities=[MessageEntityCode(0, len(ans.encode('utf-16-le')) // 2)])  # type: ignore [name-defined]
 
-    async def set_src_to_reply(self):
+    async def set_src_to_reply(self, overwrite: bool = True):
         """set the source of replied module to the registry"""
-        orig = await ctx.msg.get_reply_message()
+        orig = await ctx.msg.get_reply_message()  # type: ignore [name-defined]
         if orig.media is not None:
             f = io.BytesIO()
             await orig.download_media(f)
@@ -424,25 +461,29 @@ class Nya:
         assert '"""' in text
         header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
         name = header["name"]
-        self.set_source(name, origin)
+        self.set_source(name, origin, overwrite)
 
-    def import_src_list(self, text: str):
+    def import_src_list(self, text: str, overwrite: bool = True):
         """import the source list from {text} to the registry"""
         assert '"""' in text
         header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
         sources = header["sources"]
         for name, source in sources.items():
-            self.set_source(name, source)
+            self.set_source(name, source, overwrite)
 
-    async def import_from_reply(self):
+    async def import_from_reply(self, overwrite: bool = True):
         """import the source list from reply to the registry"""
-        orig = await ctx.msg.get_reply_message()
+        orig = await ctx.msg.get_reply_message()  # type: ignore [name-defined]
         text = get_code(orig) or orig.raw_text
-        self.import_src_list(text)
+        self.import_src_list(text, overwrite)
+
+    async def import_from_src(self, src: str, overwrite: bool = True):
+        """import the source list from the source {src} to the registry"""
+        self.import_src_list(await self.__get_from(src), overwrite)
 
     async def from_reply(self, force: bool = False):
         """install module from reply; if {force} is True version will be ignored"""
-        orig = await ctx.msg.get_reply_message() # type: ignore [name-defined]
+        orig = await ctx.msg.get_reply_message()  # type: ignore [name-defined]
         if orig.media is not None:
             f = io.BytesIO()
             await orig.download_media(f)
@@ -458,83 +499,16 @@ class Nya:
 
     def get_info(self, name: str):
         """get information about installed module {name}"""
-        module = modules[name] # type: ignore [name-defined]
-        origin = module.origin
-        version = module.extra["version"] if "version" in module.extra else "0.0.0"
-        description = module.extra["description"] if "description" in module.extra else ""
-        needs = module.extra["needs"] if "needs" in module.extra else dict()
-        wants = module.extra["wants"] if "wants" in module.extra else dict()
-        needs_pip = module.extra["needs_pip"] if "needs_pip" in module.extra else dict()
-        print(f"{name} {version} <{origin}> ({description})")
-        if needs:
-            print("needs:")
-            for dep in needs:
-                try:
-                    self.__check_dep(name, version, dep, needs[dep])
-                    print(f"    {dep}: {needs[dep]}")
-                except DependencyException as e:
-                    if e.version:
-                        print(f"    {dep}: {needs[dep]} BROKEN: found invalid {dep} {e.version}")
-                    else:
-                        print(f"    {dep}: {needs[dep]} BROKEN: not found")
-        if wants:
-            print("wants:")
-            for dep in wants:
-                try:
-                    self.__check_dep(name, version, dep, wants[dep])
-                    print(f"    {dep}: {wants[dep]}")
-                except DependencyException as e:
-                    if e.version:
-                        print(f"    {dep}: {wants[dep]} BROKEN: found invalid {dep} {e.version}")
-                    else:
-                        print(f"    {dep}: {wants[dep]} not satisfied")
-        if needs_pip:
-            print("needs_pip:")
-            for dep in needs_pip:
-                print(f"- {dep}")
+        self.__print_info(
+            *self.__parse(modules[name].code)[:-1])  # type: ignore [name-defined]
 
     def pull_info(self, text: str):
         """get information about given module by {text}"""
-        output: List[str] = []
-        assert '"""' in text
-        header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
-        name = header["name"]
-        version = header["version"] if "version" in header else "0.0.0"
-        description = header["description"] if "description" in header else ""
-        needs = header["needs"] if "needs" in header else dict()
-        wants = header["wants"] if "wants" in header else dict()
-        needs_pip = header["needs_pip"] if "needs_pip" in header else []
-        print(f"{name} {version} ({description})")
-        if needs:
-            print("needs:")
-            for dep in needs:
-                try:
-                    self.__check_dep(name, version, dep, needs[dep])
-                    print(f"    {dep}: {needs[dep]}")
-                except DependencyException as e:
-                    if e.version:
-                        print(f"    {dep}: {needs[dep]} BROKEN: found invalid {dep} {e.version}")
-                    else:
-                        print(f"    {dep}: {needs[dep]} BROKEN: not found")
-        if wants:
-            print("wants:")
-            for dep in wants:
-                try:
-                    self.__check_dep(name, version, dep, wants[dep])
-                    print(f"    {dep}: {wants[dep]}")
-                except DependencyException as e:
-                    if e.version:
-                        print(f"    {dep}: {wants[dep]} BROKEN: found invalid {dep} {e.version}")
-                    else:
-                        print(f"    {dep}: {wants[dep]} not satisfied")
-        if needs_pip:
-            print("needs_pip:")
-            for dep in needs_pip:
-                print(f"- {dep}")
+        self.__print_info(*self.__parse(text)[:-1])
 
     async def share(self, name: str, codec: Codec | None = None, by_file: bool | None = None, minify: bool | None = None):
         """share installed module {name}; to see list of available codecs run nya.codec_list()"""
-        code = modules[name].code # type: ignore [name-defined]
+        code = modules[name].code  # type: ignore [name-defined]
         assert code.startswith('"""')
         header = yaml.safe_load(code.split('"""', 2)[1].strip("\n"))
         h = f'    name: {header["name"]}\n'
@@ -557,15 +531,22 @@ class Nya:
             minify = tgpy.api.config.get("share.minify")
         text = '"""\n' + h + '"""\n' + self.__encode_code(code, codec, minify)
         if by_file:
-            text_metadata = '\n'.join(line.strip() for line in h.split('\n') if line.strip())
+            text_metadata = '\n'.join(line.strip()
+                                      for line in h.split('\n') if line.strip())
             f = io.BytesIO()
             f.name = f"{name}.py"
             f.write(text.encode())
             f.seek(0)
-            await ctx.msg.respond(text_metadata, formatting_entities=[MessageEntityCode(0, len(text_metadata.encode('utf-16-le')) // 2)], file=f) # type: ignore [name-defined]
+            fe = [MessageEntityCode(
+                0, len(text_metadata.encode('utf-16-le')) // 2)]
+            await ctx.msg.respond(  # type: ignore [name-defined]
+                text_metadata, formatting_entities=fe, file=f)
         else:
-            await ctx.msg.respond(text, formatting_entities=[MessageEntityCode(0, len(text.encode('utf-16-le')) // 2)]) # type: ignore [name-defined]
-    
+            fe = [MessageEntityCode(
+                0, len(text.encode('utf-16-le')) // 2)]
+            await ctx.msg.respond(  # type: ignore [name-defined]
+                text, formatting_entities=fe)
+
     def codec_list(self):
         print(*[codec.name for codec in Codec], sep=", ")
 
@@ -595,48 +576,22 @@ class Nya:
 
     def print_graph(self):
         """print dependency graph"""
-        for name in modules:
+        for name in modules:  # type: ignore [name-defined]
             self.get_info(name)
             print()
 
     async def run(self, text: str):
         """run module from provided {text}"""
         output: List[str] = []
-        assert '"""' in text
-        header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
-        name = header["name"]
-        version = VersionInfo.parse(header["version"]) if "version" in header else VersionInfo.parse("0.0.0")
-        needs = header["needs"] if "needs" in header else dict()
-        wants = header["wants"] if "wants" in header else dict()
-        needs_pip = header["needs_pip"] if "needs_pip" in header else []
-        code = self.__decode_code(text.split('"""', 2)[2].strip("\n"))
-        for dep in needs:
-            try:
-                self.__check_dep(name, version, dep, needs[dep])
-            except DependencyException as e:
-                print(*output, sep="\n")
-                raise e
-        for dep in wants:
-            try:
-                self.__check_dep(name, str(version), dep, wants[dep])
-            except DependencyException as e:
-                if e.version:
-                    print(*output, sep="\n")
-                    self.regraph()
-                    raise e
-        for dep in needs_pip:
-            subprocess.run([sys.executable, "-m", "pip", "install", dep], check=True)
-        try:
-            await tgpy.api.tgpy_eval(code)
-            output.append(f"ran module {name} {version}")
-        except:
-            output.append(f"failed to run module {name} {version}")
+        name, version, _, needs, wants, needs_pip, code = self.__parse(text)
+        self.__check_deps(name, version, needs, wants, needs_pip, output)
+        await self.__run(name, version, code, output)
         print(*output, sep="\n")
         self.regraph()
 
     async def run_from_reply(self):
         """run module from reply"""
-        orig = await ctx.msg.get_reply_message()
+        orig = await ctx.msg.get_reply_message()  # type: ignore [name-defined]
         text = get_code(orig) or orig.raw_text
         try:
             origin = f"https://t.me/{orig.chat.username}/{orig.id}"

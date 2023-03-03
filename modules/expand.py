@@ -3,10 +3,10 @@
     name: expand
     needs:
       shell: 0.0.0
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/expand.py
-    priority: 23
+    priority: 22
     version: 0.0.0
     wants: {}
 """

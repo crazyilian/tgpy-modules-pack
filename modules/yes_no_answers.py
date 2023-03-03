@@ -8,7 +8,7 @@
     needs_pip: []
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/yes_no_answers.py
-    priority: 25
+    priority: 24
     version: 0.1.1
     wants: {}
 """

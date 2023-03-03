@@ -2,10 +2,10 @@
     description: replace default "TGPy>" prefix
     name: message_design
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/message_design.py
-    priority: 19
+    priority: 18
     version: 0.0.0
     wants: {}
 """

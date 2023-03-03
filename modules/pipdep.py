@@ -2,7 +2,7 @@
     description: ''
     name: pipdep
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://t.me/tgpy_flood/10012
     priority: 1

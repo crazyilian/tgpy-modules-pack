@@ -3,10 +3,10 @@
       functions
     name: try_await
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/try_await.py
-    priority: 16
+    priority: 15
     version: 0.0.0
     wants: {}
 """

@@ -4,11 +4,11 @@
     needs:
       macros_base: 0.0.0
     needs_pip:
-    - unsync
+      unsync: unsync
     once: false
-    origin: https://t.me/tgpy_flood/26256
+    origin: https://t.me/tgpy_flood/28781
     priority: 7
-    version: 0.1.0
+    version: 0.1.1
     wants: {}
 """
 import asyncio

@@ -6,10 +6,10 @@
       cron: 0.0.0
       pet_bot: 0.0.0
       tg_name: 0.0.0
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/channel_join_requests.py
-    priority: 22
+    priority: 21
     version: 0.0.0
     wants: {}
 """

@@ -2,10 +2,10 @@
     description: apply tex automatically and via .tex
     name: tex
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/tex.py
-    priority: 29
+    priority: 28
     version: 0.0.0
     wants: {}
 """

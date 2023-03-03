@@ -3,10 +3,10 @@
       input)
     name: config_loader
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/config_loader.py
-    priority: 15
+    priority: 14
     version: 0.0.0
     wants: {}
 """

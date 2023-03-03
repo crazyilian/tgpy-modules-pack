@@ -4,12 +4,12 @@
     needs:
       dot: 0.1.0
     needs_pip:
-    - html2text
-    - aiohttp
+      aiohttp: aiohttp
+      html2text: html2text
     once: false
     origin: https://t.me/tgpy_flood/28543
-    priority: 10
-    version: 0.3.0
+    priority: 33
+    version: 0.3.1
     wants: {}
 """
 import ast

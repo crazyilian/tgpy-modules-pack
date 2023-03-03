@@ -2,10 +2,10 @@
     description: ''
     name: uptime
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://t.me/tgpy_flood/6513
-    priority: 11
+    priority: 10
     version: 0.0.0
     wants: {}
 """

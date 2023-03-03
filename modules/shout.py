@@ -2,7 +2,7 @@
     description: ''
     name: shout
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://t.me/tgpy_flood/27736
     priority: 5

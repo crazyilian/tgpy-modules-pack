@@ -5,11 +5,11 @@
       shell: 0.0.0
       try_await: 0.0.0
     needs_pip:
-    - sympy
+      sympy: sympy
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/factor.py
-    priority: 26
-    version: 0.0.1
+    priority: 25
+    version: 0.1.0
     wants: {}
 """
 from collections import defaultdict

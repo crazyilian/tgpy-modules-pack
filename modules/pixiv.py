@@ -6,11 +6,11 @@
       dot: 0.2.0
       try_await: 0.0.0
     needs_pip:
-    - PixivPy-Async
+      pixivpy_async: PixivPy-Async
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/pixiv.py
-    priority: 17
-    version: 0.0.1
+    priority: 16
+    version: 0.1.0
     wants: {}
 """
 import pixivpy_async

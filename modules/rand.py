@@ -5,10 +5,10 @@
     needs:
       dot: 0.1.0
       expand: 0.0.0
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/rand.py
-    priority: 24
+    priority: 23
     version: 0.0.0
     wants: {}
 """

@@ -3,10 +3,10 @@
     name: pet_bot
     needs:
       config_loader: 0.0.0
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/pet_bot.py
-    priority: 21
+    priority: 20
     version: 0.0.0
     wants: {}
 """

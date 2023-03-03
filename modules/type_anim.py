@@ -2,7 +2,7 @@
     description: ''
     name: type_anim
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://t.me/tgpy_flood/24585
     priority: 3

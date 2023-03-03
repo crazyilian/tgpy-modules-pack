@@ -3,10 +3,10 @@
     name: mention_all
     needs:
       tg_name: 0.0.0
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/mention_all.py
-    priority: 14
+    priority: 13
     version: 0.0.0
     wants: {}
 """

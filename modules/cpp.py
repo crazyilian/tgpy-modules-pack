@@ -3,10 +3,10 @@
     name: cpp
     needs:
       dot: 0.1.0
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/cpp.py
-    priority: 30
+    priority: 29
     version: 0.0.0
     wants: {}
 """

@@ -3,11 +3,11 @@
     name: mood
     needs: {}
     needs_pip:
-    - dostoevsky
+      dostoevsky: dostoevsky
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/mood.py
-    priority: 27
-    version: 0.1.0
+    priority: 26
+    version: 0.2.0
     wants: {}
 """
 from dostoevsky.tokenization import RegexTokenizer

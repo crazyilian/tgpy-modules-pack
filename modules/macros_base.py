@@ -2,7 +2,7 @@
     description: ''
     name: macros_base
     needs: {}
-    needs_pip: []
+    needs_pip: {}
     once: false
     origin: https://t.me/tgpy_flood/24317
     priority: 6

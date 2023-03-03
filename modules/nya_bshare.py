@@ -6,7 +6,7 @@
     needs_pip: []
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/nya_bshare.py
-    priority: 12
+    priority: 11
     version: 0.3.0
     wants: {}
 """

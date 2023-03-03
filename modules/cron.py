@@ -3,11 +3,11 @@
     name: cron
     needs: {}
     needs_pip:
-    - croniter
+      croniter: croniter
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/cron.py
-    priority: 20
-    version: 0.0.9
+    priority: 19
+    version: 0.1.0
     wants: {}
 """
 import asyncio
