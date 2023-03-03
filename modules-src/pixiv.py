@@ -6,8 +6,8 @@
       dot: 0.2.0
       try_await: 0.0.0
     needs_pip:
-    - PixivPy-Async
-    version: 0.0.1
+      pixivpy_async: PixivPy-Async
+    version: 0.1.0
 """
 import pixivpy_async
 import asyncio

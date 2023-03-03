@@ -2,8 +2,8 @@
     description: call function with schedule by cron
     name: cron
     needs_pip:
-    - croniter
-    version: 0.0.9
+      croniter: croniter
+    version: 0.1.0
 """
 import asyncio
 import datetime

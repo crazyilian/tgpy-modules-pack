@@ -2,8 +2,8 @@
     description: get most positive and negative messages in chat & get mood of one message
     name: mood
     needs_pip:
-    - dostoevsky
-    version: 0.1.0
+      dostoevsky: dostoevsky
+    version: 0.2.0
 """
 from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
