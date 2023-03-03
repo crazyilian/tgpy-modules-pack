@@ -4,11 +4,12 @@
     needs:
       shell: 0.0.0
       try_await: 0.0.0
-    needs_pip: []
+    needs_pip:
+    - sympy
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/factor.py
-    priority: 24
-    version: 0.0.0
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/factor.py
+    priority: 26
+    version: 0.0.1
     wants: {}
 """
 from collections import defaultdict

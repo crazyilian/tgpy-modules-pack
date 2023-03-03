@@ -5,8 +5,8 @@
       dot: 0.1.0
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/cpp.py
-    priority: 21
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/cpp.py
+    priority: 30
     version: 0.0.0
     wants: {}
 """

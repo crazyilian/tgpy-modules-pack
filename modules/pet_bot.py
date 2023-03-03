@@ -5,8 +5,8 @@
       config_loader: 0.0.0
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/pet_bot.py
-    priority: 19
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/pet_bot.py
+    priority: 21
     version: 0.0.0
     wants: {}
 """

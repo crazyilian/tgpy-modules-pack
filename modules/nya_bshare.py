@@ -5,8 +5,8 @@
       nya: 0.25.1
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/nya_bshare.py
-    priority: 11
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/nya_bshare.py
+    priority: 12
     version: 0.3.0
     wants: {}
 """

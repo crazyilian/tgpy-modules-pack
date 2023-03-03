@@ -7,8 +7,8 @@
       tg_name: 0.0.0
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/track_last_seen.py
-    priority: 26
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/track_last_seen.py
+    priority: 31
     version: 0.0.0
     wants: {}
 """

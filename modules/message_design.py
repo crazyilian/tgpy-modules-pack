@@ -4,8 +4,8 @@
     needs: {}
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/message_design.py
-    priority: 12
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/message_design.py
+    priority: 19
     version: 0.0.0
     wants: {}
 """

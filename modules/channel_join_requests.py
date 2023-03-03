@@ -8,7 +8,7 @@
       tg_name: 0.0.0
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/channel_join_requests.py
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/channel_join_requests.py
     priority: 22
     version: 0.0.0
     wants: {}

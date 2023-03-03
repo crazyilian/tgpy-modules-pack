@@ -5,8 +5,8 @@
       shell: 0.0.0
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/expand.py
-    priority: 16
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/expand.py
+    priority: 23
     version: 0.0.0
     wants: {}
 """

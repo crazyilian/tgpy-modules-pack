@@ -2,11 +2,12 @@
     description: call function with schedule by cron
     name: cron
     needs: {}
-    needs_pip: []
+    needs_pip:
+    - croniter
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/cron.py
-    priority: 17
-    version: 0.0.0
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/cron.py
+    priority: 20
+    version: 0.0.9
     wants: {}
 """
 import asyncio
@@ -14,7 +15,7 @@ import datetime
 import logging
 from croniter import croniter
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__.split('/')[-1])
 
 TZ_MOSCOW = datetime.timezone(datetime.timedelta(hours=3))
 

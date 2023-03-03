@@ -7,8 +7,8 @@
       expand: 0.0.0
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/rand.py
-    priority: 23
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/rand.py
+    priority: 24
     version: 0.0.0
     wants: {}
 """

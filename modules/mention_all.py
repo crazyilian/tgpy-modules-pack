@@ -5,8 +5,8 @@
       tg_name: 0.0.0
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/mention_all.py
-    priority: 29
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/mention_all.py
+    priority: 14
     version: 0.0.0
     wants: {}
 """

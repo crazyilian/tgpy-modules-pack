@@ -4,8 +4,8 @@
     needs: {}
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/tex.py
-    priority: 28
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/tex.py
+    priority: 29
     version: 0.0.0
     wants: {}
 """

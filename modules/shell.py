@@ -5,27 +5,28 @@
       dot: 0.1.0
     needs_pip: []
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/shell.py
-    priority: 15
-    version: 0.0.0
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/shell.py
+    priority: 18
+    version: 0.1.0
     wants: {}
 """
 import asyncio
 import subprocess
 
 
-async def run_shell(code):
+async def run_shell(code, **kwargs):
     proc = await asyncio.create_subprocess_shell(
         code,
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT
+        stderr=asyncio.subprocess.STDOUT,
+        **kwargs
     )
     stdout, _ = await proc.communicate()
     return stdout.decode(), proc.returncode
 
 
-def run_sync_shell(code):
-    proc = subprocess.run(code, capture_output=True, check=True, encoding="utf-8")
+def run_sync_shell(code, **kwargs):
+    proc = subprocess.run(code, capture_output=True, check=True, encoding="utf-8", **kwargs)
     return proc.stdout, proc.returncode
 
 

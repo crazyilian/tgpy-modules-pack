@@ -5,11 +5,12 @@
       config_loader: 0.0.0
       dot: 0.2.0
       try_await: 0.0.0
-    needs_pip: []
+    needs_pip:
+    - PixivPy-Async
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/pixiv.py
-    priority: 25
-    version: 0.0.0
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/pixiv.py
+    priority: 17
+    version: 0.0.1
     wants: {}
 """
 import pixivpy_async
@@ -19,7 +20,7 @@ import time
 
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__.split('/')[-1])
 
 REQUEST_ATTEMPTS = 3
 ACCESS_TOKEN_TIMEOUT = 60 * 60 - 5
