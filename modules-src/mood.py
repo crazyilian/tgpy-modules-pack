@@ -1,15 +1,27 @@
 """
     description: get most positive and negative messages in chat & get mood of one message
     name: mood
-    version: 0.0.0
+    needs_pip:
+    - dostoevsky
+    version: 0.1.0
 """
 from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
+import dostoevsky.data
+import os
 from datetime import datetime
 from operator import itemgetter
 
 tokenizer = RegexTokenizer()
 model = FastTextSocialNetworkModel(tokenizer=tokenizer)
+
+
+def install_fasttext():
+    source, destination = dostoevsky.data.AVAILABLE_FILES['fasttext-social-network-model']
+    destination_path = os.path.join(dostoevsky.data.DATA_BASE_PATH, destination)
+    if not os.path.exists(destination_path):
+        downloader = dostoevsky.data.DataDownloader()
+        downloader.download(source=source, destination=destination)
 
 
 async def predict_and_get_top_results(ids, texts, title, msg):
@@ -76,13 +88,13 @@ async def topmoodcnt(topcnt_=1000):
     return 'Done'
 
 
-async def topmood():
+async def topmood(days=1):
     msg = ctx.msg
     ct = datetime.now().astimezone()
     texts = []
     ids = []
     async for mess in client.iter_messages(msg.chat_id):
-        if (ct - mess.date).days > 0:
+        if (ct - mess.date).days >= days:
             break
         try:
             if not isinstance(mess.text, str):
@@ -93,7 +105,7 @@ async def topmood():
             continue
         texts.append(mess.text)
         ids.append(mess.id)
-    await predict_and_get_top_results(ids, texts, 'of the day')
+    await predict_and_get_top_results(ids, texts, 'of the day', msg)
     return 'Done'
 
 
@@ -104,5 +116,7 @@ async def sentiment():
     return '\n' + '\n'.join(map(lambda el: f'{el[1]}: {round(el[0], 7)}',
                                 filter(lambda el: el[0] > 0.0001, sorted(zip(res.values(), res.keys()), reverse=True))))
 
+
+install_fasttext()
 
 __all__ = ['sentiment', 'topmood', 'topmoodcnt']
