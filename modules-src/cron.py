@@ -3,14 +3,14 @@
     name: cron
     needs_pip:
     - croniter
-    version: 0.0.1
+    version: 0.0.2
 """
 import asyncio
 import datetime
 import logging
 from croniter import croniter
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__.split('/')[-1])
 
 TZ_MOSCOW = datetime.timezone(datetime.timedelta(hours=3))
 

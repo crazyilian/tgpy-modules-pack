@@ -7,7 +7,7 @@
       try_await: 0.0.0
     needs_pip:
     - PixivPy-Async
-    version: 0.0.0
+    version: 0.0.1
 """
 import pixivpy_async
 import asyncio
@@ -16,7 +16,7 @@ import time
 
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__.split('/')[-1])
 
 REQUEST_ATTEMPTS = 3
 ACCESS_TOKEN_TIMEOUT = 60 * 60 - 5
