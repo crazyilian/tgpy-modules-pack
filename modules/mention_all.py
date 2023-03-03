@@ -1,5 +1,5 @@
 """
-    description: 'mention all users in chat'
+    description: mention all users in chat
     name: mention_all
     needs:
       tg_name: 0.0.0

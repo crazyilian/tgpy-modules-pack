@@ -1,4 +1,5 @@
 """
+    description: notify when target users go online or offline
     name: track_last_seen
     needs:
       config_loader: 0.0.0
@@ -6,9 +7,8 @@
       tg_name: 0.0.0
     once: false
     origin: tgpy://module/track_last_seen
-    priority: 22
+    priority: 21
     save_locals: true
-    description: notify when target users go online or offline
 """
 import telethon
 import asyncio

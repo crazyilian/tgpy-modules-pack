@@ -7,7 +7,7 @@
     - unsync
     once: false
     origin: https://t.me/tgpy_flood/26256
-    priority: 28
+    priority: 26
     version: 0.1.0
     wants: {}
 """

@@ -1,5 +1,5 @@
 """
-    description: 'get username/first name/title of telethon entity'
+    description: get username/first name/title of telethon entity
     name: tg_name
     needs: {}
     needs_pip: []

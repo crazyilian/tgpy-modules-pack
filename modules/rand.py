@@ -1,4 +1,6 @@
 """
+    description: generate random from expanded string (e.g. rand("{1..100}") -> random
+      int from 1 to 100)
     name: rand
     needs:
       dot: 0.1.0
@@ -7,7 +9,6 @@
     origin: tgpy://module/rand
     priority: 16
     save_locals: true
-    description: generate random from expanded string (e.g. rand("{1..100}") -> random int from 1 to 100)
 """
 import random
 

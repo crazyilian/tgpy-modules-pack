@@ -1,5 +1,5 @@
 """
-    description: 'factorize numbers asynchronously'
+    description: factorize numbers asynchronously
     name: factor
     needs:
       shell: 0.0.0

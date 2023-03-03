@@ -1,11 +1,11 @@
 """
-    description: 'apply tex automatically and via .tex'
+    description: apply tex automatically and via .tex
     name: tex
     needs: {}
     needs_pip: []
     once: false
     origin: tgpy://modules/tex
-    priority: 26
+    priority: 24
     version: 0.0.0
     wants: {}
 """

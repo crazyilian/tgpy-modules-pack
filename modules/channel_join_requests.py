@@ -1,4 +1,5 @@
 """
+    description: track pending join requests in target channels
     name: channel_join_requests
     needs:
       config_loader: 0.0.0
@@ -10,7 +11,6 @@
     priority: 14
     save_locals: true
     version: 0.0.0
-    description: "track pending join requests in target channels"
 """
 import telethon
 

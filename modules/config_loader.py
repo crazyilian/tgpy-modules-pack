@@ -1,10 +1,11 @@
 """
+    description: wrapper of tgpy.api.config for modules (default config, required values
+      input)
     name: config_loader
     once: false
     origin: tgpy://module/config_loader
     priority: 9
     save_locals: true
-    description: "wrapper of tgpy.api.config for modules (default config, required values input)"
 """
 import tgpy.api
 import logging

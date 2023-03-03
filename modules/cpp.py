@@ -1,5 +1,5 @@
 """
-    description: 'run cpp code'
+    description: run cpp code
     name: cpp
     needs:
       dot: 0.1.0

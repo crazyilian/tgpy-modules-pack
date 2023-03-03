@@ -1,5 +1,5 @@
 """
-    description: 'call function with schedule by cron'
+    description: call function with schedule by cron
     name: cron
     needs: {}
     needs_pip: []

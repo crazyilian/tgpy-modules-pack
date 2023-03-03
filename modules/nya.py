@@ -4,9 +4,9 @@
     needs: {}
     needs_pip: []
     once: false
-    origin: https://t.me/tgpy_flood/28138
+    origin: https://gist.github.com/miralushch/b43ce0642f89814981f341308ba9dac9
     priority: 0
-    version: 0.26.6
+    version: 0.27.4
     wants: {}
 """
 import subprocess
@@ -50,7 +50,7 @@ try:
 except ImportError:
     subprocess.run([sys.executable, "-m", "pip", "install", "python-minifier"], check=True)
     import python_minifier
-from typing import Tuple, List, Set, Callable, Awaitable
+from typing import Tuple, List, Set, Callable, Awaitable, Union
 import io
 from pathlib import Path
 from enum import Enum
@@ -86,9 +86,10 @@ class Nya:
         """DONT TOUCH THIS"""
         async def msg_handler(src: str) -> str:
             source = urlparse(src)
+            chat: Union[str, int]
             chat, id = source.path[1:].split("/", 2)[-2:]
             if source.path[1] == "c":
-                id = "-100" + id
+                chat = int("-100" + chat)
             orig = await client.get_messages(chat, ids=int(id)) # type: ignore [name-defined]
             if orig.media is not None:
                 f = io.BytesIO()
@@ -345,17 +346,21 @@ class Nya:
         print(*output, sep="\n")
         self.regraph()
 
-    async def reg_install(self, name: str, last_tried=None):
+    async def reg_install(self, name: str):
+        """install the module {name} using registry"""
+        src = tgpy.api.config.get("registry")[name]
+        await self.dep_install(src, await self.__get_from(src))
+
+    async def dep_install(self, origin: str, text: str, force: bool = False, last_tried: str | None = None):
         """install the module {name} using registry"""
         try:
-            src = tgpy.api.config.get("registry")[name]
-            await self.install(src, await self.__get_from(src))
+            await self.install(origin, text, force)
         except DependencyException as e:
             if e.name == last_tried:
                 raise e
             else:
                 await self.reg_install(e.name)
-                await self.reg_install(name)
+                await self.dep_install(origin, text, force, last_tried=e.name)
 
     async def update(self):
         """update all installed modules using registry"""
@@ -440,7 +445,7 @@ class Nya:
             origin = f"https://t.me/{orig.chat.username}/{orig.id}"
         else:
             origin = f"https://t.me/c/{orig.chat.id}/{orig.id}"
-        await self.install(origin, text, force)
+        await self.dep_install(origin, text, force)
 
     def get_info(self, name: str):
         """get information about installed module {name}"""
@@ -576,7 +581,8 @@ class Nya:
             name = tgpy.api.config.get("nya.last_installed")
         delete_module_file(name)
         print(f"removed module {name}.")
-        self.regraph()
+        if name != "nya":
+            self.regraph()
 
     def print_graph(self):
         """print dependency graph"""

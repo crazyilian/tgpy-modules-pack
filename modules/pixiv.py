@@ -1,4 +1,5 @@
 """
+    description: get stats of logged in pixiv user
     name: pixiv
     needs:
       config_loader: 0.0.0
@@ -8,7 +9,6 @@
     origin: tgpy://module/pixiv
     priority: 20
     save_locals: false
-    description: get stats of logged in pixiv user
 """
 import pixivpy_async
 import asyncio

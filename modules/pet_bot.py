@@ -1,4 +1,5 @@
 """
+    description: telethon bot with Bot API
     name: pet_bot
     needs:
       config_loader: 0.0.0
@@ -6,7 +7,6 @@
     origin: tgpy://module/pet_bot
     priority: 10
     save_locals: true
-    description: telethon bot with Bot API
 """
 import telethon
 from tgpy.utils import DATA_DIR

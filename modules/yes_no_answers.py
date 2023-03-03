@@ -1,13 +1,17 @@
 """
+    description: react when someone answers to "yes", "no", etc. with rhyme in target
+      chats
     name: yes_no_answers
     needs:
       config_loader: 0.0.0
       tg_name: 0.0.0
+    needs_pip: []
     once: false
-    origin: tgpy://module/yes_no_answers
-    priority: 29
+    origin: https://t.me/c/1796785408/2200
+    priority: 27
     save_locals: true
-    description: react when someone answers to "yes", "no", etc. with rhyme in target chats
+    version: 0.1.1
+    wants: {}
 """
 import telethon
 
@@ -17,15 +21,19 @@ really_handling_yes_no_chats = set()
 
 class YesNoAnswers:
     def __init__(self):
-        self.config = ModuleConfig('yes_no_answers', default_dict={'chats': []})
+        self.config = ModuleConfig('yes_no_answers', default_dict={'chats': [], 'suffixes': {
+            "да": "да",
+            "нет": "ет",
+            "ладно": "дно"
+        }})
         self.telethon_handlers = set()
         self.chats = set()
-        self.add(*self.config.chats)
+        self.add_chat(*self.config.chats)
 
     def __save_chats(self):
         self.config.chats = list(self.chats)
 
-    def add(self, *chats):
+    def add_chat(self, *chats):
         """add new chats to handle yes no answers"""
         self.chats.update(chats)
         self.__save_chats()
@@ -38,12 +46,7 @@ class YesNoAnswers:
         async def handle_yes_no_answer(event):
             if event.chat_id not in self.chats:
                 return
-            SUFFIXES = {
-                "да": "да",
-                "нет": "ет",
-                "ладно": "дно"
-            }
-            for word, suffix in SUFFIXES.items():
+            for word, suffix in self.config.suffixes.items():
                 if not event.text.lower().endswith(suffix):
                     continue
                 orig = await event.get_reply_message()
@@ -51,15 +54,30 @@ class YesNoAnswers:
                     await event.reply("Ловко парировал(а) " + get_name(event.sender))
                     break
 
-    def remove(self, *chats):
+    def remove_chat(self, *chats):
         """remove chat handlers"""
         self.chats.difference_update(chats)
         self.__save_chats()
 
-    async def get(self):
+    async def get_chats(self):
         """get current handling chats"""
         for chat in self.chats:
             print(chat, ':', get_name(await client.get_entity(chat)))
+
+    def add_word(self, word: str, suffix: str):
+        """associate word with suffix"""
+        self.config.suffixes[word] = suffix
+        self.config.save()
+
+    def remove_word(self, word):
+        """remove word association"""
+        self.config.suffixes.pop(word)
+        self.config.save()
+
+    def get_words(self):
+        """get word and suffix associations"""
+        for (word, suf) in self.config.suffixes.items():
+            print(word, ':', suf)
 
 
 yes_no_answers = YesNoAnswers()
