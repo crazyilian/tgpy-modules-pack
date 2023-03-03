@@ -4,6 +4,8 @@
     needs:
       shell: 0.0.0
       try_await: 0.0.0
+    needs_pip:
+    - sympy
     version: 0.0.0
 """
 from collections import defaultdict

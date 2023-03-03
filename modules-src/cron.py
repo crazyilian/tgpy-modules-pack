@@ -1,6 +1,8 @@
 """
     description: call function with schedule by cron
     name: cron
+    needs_pip:
+    - croniter
     version: 0.0.0
 """
 import asyncio
