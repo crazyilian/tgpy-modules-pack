@@ -6,7 +6,7 @@
     once: false
     origin: https://gist.github.com/miralushch/b43ce0642f89814981f341308ba9dac9
     priority: 0
-    version: 0.27.4
+    version: 0.28.0
     wants: {}
 """
 import subprocess
@@ -50,7 +50,7 @@ try:
 except ImportError:
     subprocess.run([sys.executable, "-m", "pip", "install", "python-minifier"], check=True)
     import python_minifier
-from typing import Tuple, List, Set, Callable, Awaitable, Union
+from typing import Tuple, Dict, List, Set, Callable, Awaitable, Union
 import io
 from pathlib import Path
 from enum import Enum
@@ -59,6 +59,7 @@ try:
 except ImportError:
     subprocess.run([sys.executable, "-m", "pip", "install", "gists.py"], check=True)
     import gists # type: ignore [import]
+import aiohttp
 from tgpy.modules import Module, delete_module_file, get_module_names, get_user_modules # type: ignore [import]
 
 class DependencyException(Exception):
@@ -99,9 +100,17 @@ class Nya:
             else:
                 text = get_code(orig) or orig.raw_text
             return text
+        self.__gist_client = gists.Client()
         async def gist_handler(src: str) -> str:
-            return (await gists.Client().get_gist(src.split("/")[-1])).files[0].content
-        self.__source_handlers = {("https", "t.me"): msg_handler, ("https", "gist.github.com"): gist_handler}
+            return (await self.__gist_client.get_gist(src.split("/")[-1])).files[0].content
+        self.__aiohttp_session = aiohttp.ClientSession()
+        async def plain_text_handler(src: str) -> str:
+            return await (await self.__aiohttp_session.get(src)).text()
+        self.__source_handlers: Dict[Tuple[str, str], Callable[[str], Awaitable[str]]] = {
+            ("https", "t.me"): msg_handler,
+            ("https", "gist.github.com"): gist_handler,
+            ("https", "raw.githubusercontent.com"): plain_text_handler
+        }
         if tgpy.api.config.get("registry") is None:
             tgpy.api.config.set("registry", dict())
             tgpy.api.config.save()

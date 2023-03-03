@@ -3,10 +3,12 @@
     name: expand
     needs:
       shell: 0.0.0
+    needs_pip: []
     once: false
-    origin: tgpy://module/expand
-    priority: 7
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/expand.py
+    priority: 16
+    version: 0.0.0
+    wants: {}
 """
 def expand(s):
     stdout = run_sync_shell(["bash", "-c", f"printf '%s\n' {s}"])[0]

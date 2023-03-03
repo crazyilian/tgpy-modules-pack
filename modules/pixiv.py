@@ -5,10 +5,12 @@
       config_loader: 0.0.0
       dot: 0.2.0
       try_await: 0.0.0
+    needs_pip: []
     once: false
-    origin: tgpy://module/pixiv
-    priority: 20
-    save_locals: false
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/pixiv.py
+    priority: 25
+    version: 0.0.0
+    wants: {}
 """
 import pixivpy_async
 import asyncio

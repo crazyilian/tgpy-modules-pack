@@ -5,9 +5,8 @@
       try_await: 0.0.0
     needs_pip: []
     once: false
-    origin: tgpy://modules/dot_hook
-    priority: 4
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/dot_hook.py
+    priority: 14
     version: 0.0.0
     wants: {}
 """

@@ -4,9 +4,8 @@
     needs: {}
     needs_pip: []
     once: false
-    origin: tgpy://modules/tg_name
-    priority: 11
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/tg_name.py
+    priority: 20
     version: 0.0.0
     wants: {}
 """

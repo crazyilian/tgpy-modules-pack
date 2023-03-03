@@ -1,9 +1,13 @@
 """
     description: get most positive and negative messages in chat & get mood of one message
     name: mood
+    needs: {}
+    needs_pip: []
     once: false
-    origin: tgpy://module/mood
-    priority: 22
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/mood.py
+    priority: 27
+    version: 0.0.0
+    wants: {}
 """
 from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel

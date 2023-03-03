@@ -5,10 +5,12 @@
       config_loader: 0.0.0
       pet_bot: 0.0.0
       tg_name: 0.0.0
+    needs_pip: []
     once: false
-    origin: tgpy://module/track_last_seen
-    priority: 21
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/track_last_seen.py
+    priority: 26
+    version: 0.0.0
+    wants: {}
 """
 import telethon
 import asyncio

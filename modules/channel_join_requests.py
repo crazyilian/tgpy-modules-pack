@@ -6,11 +6,12 @@
       cron: 0.0.0
       pet_bot: 0.0.0
       tg_name: 0.0.0
+    needs_pip: []
     once: false
-    origin: tgpy://module/channel_join_requests
-    priority: 14
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/channel_join_requests.py
+    priority: 22
     version: 0.0.0
+    wants: {}
 """
 import telethon
 

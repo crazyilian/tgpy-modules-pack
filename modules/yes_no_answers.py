@@ -7,9 +7,8 @@
       tg_name: 0.0.0
     needs_pip: []
     once: false
-    origin: https://t.me/c/1796785408/2200
-    priority: 27
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/yes_no_answers.py
+    priority: 31
     version: 0.1.1
     wants: {}
 """

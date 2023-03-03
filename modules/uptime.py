@@ -1,9 +1,13 @@
 """
+    description: ''
     name: uptime
+    needs: {}
+    needs_pip: []
     once: false
-    origin: https://t.me/tgpy_flood/6513
-    priority: 15
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/uptime.py
+    priority: 30
+    version: 0.0.0
+    wants: {}
 """
 from datetime import datetime
 

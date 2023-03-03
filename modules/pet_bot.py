@@ -3,10 +3,12 @@
     name: pet_bot
     needs:
       config_loader: 0.0.0
+    needs_pip: []
     once: false
-    origin: tgpy://module/pet_bot
-    priority: 10
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/pet_bot.py
+    priority: 19
+    version: 0.0.0
+    wants: {}
 """
 import telethon
 from tgpy.utils import DATA_DIR

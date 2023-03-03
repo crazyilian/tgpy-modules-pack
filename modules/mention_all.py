@@ -5,9 +5,8 @@
       tg_name: 0.0.0
     needs_pip: []
     once: false
-    origin: tgpy://module/mention_all
-    priority: 12
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/mention_all.py
+    priority: 29
     version: 0.0.0
     wants: {}
 """

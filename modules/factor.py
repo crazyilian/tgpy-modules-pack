@@ -6,9 +6,8 @@
       try_await: 0.0.0
     needs_pip: []
     once: false
-    origin: tgpy://modules/factor
-    priority: 18
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/factor.py
+    priority: 24
     version: 0.0.0
     wants: {}
 """

@@ -1,10 +1,13 @@
 """
     description: replace default "TGPy>" prefix
     name: message_design
+    needs: {}
+    needs_pip: []
     once: false
-    origin: tgpy://module/message_design
-    priority: 2
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/message_design.py
+    priority: 12
+    version: 0.0.0
+    wants: {}
 """
 import tgpy._core.message_design as message_design
 

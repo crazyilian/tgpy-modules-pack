@@ -4,9 +4,8 @@
     needs: {}
     needs_pip: []
     once: false
-    origin: tgpy://module/cron
-    priority: 8
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/cron.py
+    priority: 17
     version: 0.0.0
     wants: {}
 """

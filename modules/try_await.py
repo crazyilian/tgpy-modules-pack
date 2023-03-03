@@ -2,10 +2,13 @@
     description: make sync function async & wrapper with same syntax for sync and async
       functions
     name: try_await
+    needs: {}
+    needs_pip: []
     once: false
-    origin: tgpy://module/try_await
-    priority: 3
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/try_await.py
+    priority: 13
+    version: 0.0.0
+    wants: {}
 """
 import asyncio
 import concurrent.futures

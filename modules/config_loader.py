@@ -2,10 +2,13 @@
     description: wrapper of tgpy.api.config for modules (default config, required values
       input)
     name: config_loader
+    needs: {}
+    needs_pip: []
     once: false
-    origin: tgpy://module/config_loader
-    priority: 9
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/config_loader.py
+    priority: 18
+    version: 0.0.0
+    wants: {}
 """
 import tgpy.api
 import logging

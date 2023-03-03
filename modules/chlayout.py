@@ -5,7 +5,7 @@
     needs_pip: []
     once: false
     origin: https://t.me/tgpy_flood/24578
-    priority: 19
+    priority: 4
     save_locals: true
     version: 0.0.0
     wants: {}

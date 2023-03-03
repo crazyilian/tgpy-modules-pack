@@ -5,10 +5,12 @@
     needs:
       dot: 0.1.0
       expand: 0.0.0
+    needs_pip: []
     once: false
-    origin: tgpy://module/rand
-    priority: 16
-    save_locals: true
+    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/rand.py
+    priority: 23
+    version: 0.0.0
+    wants: {}
 """
 import random
 

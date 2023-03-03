@@ -5,17 +5,17 @@
       dot: 0.1.0
     needs_pip:
     - html2text
-    - httpx
+    - aiohttp
     once: false
     origin: https://t.me/tgpy_flood/28543
-    priority: 30
-    version: 0.2.1
+    priority: 10
+    version: 0.3.0
     wants: {}
 """
 import ast
 import json
 import html2text
-import httpx
+import aiohttp
 import re
 
 from itertools import islice
@@ -31,7 +31,7 @@ def split_every(n, iterable):
 
 @dot("genius")
 async def genius(query):
-    data = (await httpx_client.get("https://genius.com/api/search/multi", params={"q": query})).json()
+    data = await (await aiohttp_session.get("https://genius.com/api/search/multi", params={"q": query})).json()
     url = None
     for section in data["response"]["sections"]:
         if section["type"] == "song":
@@ -42,7 +42,7 @@ async def genius(query):
     if url is None:
         return "Song not found"
 
-    data = (await httpx_client.get(url)).text
+    data = await (await aiohttp_session.get(url)).text()
     data = re.search(r"__PRELOADED_STATE__ = JSON\.parse\((.*)\);$", data, flags=re.M).group(1)
     data = json.loads(ast.literal_eval(data).replace(r"\$", "$"))
 
@@ -70,6 +70,6 @@ async def genius(query):
     await ctx.msg.delete()
 
 
-httpx_client = httpx.AsyncClient(timeout=None)
+aiohttp_session = aiohttp.ClientSession()
 
 __all__ = ["genius"]
