@@ -2,14 +2,14 @@
     description: factorize numbers asynchronously
     name: factor
     needs:
-      shell: 0.0.0
-      try_await: 0.0.0
+      await_utils: 0.0.0
+      shell: 0.2.0
     needs_pip:
       sympy: sympy
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/factor.py
-    priority: 25
-    version: 0.1.0
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/factor.py
+    priority: 26
+    version: 0.1.1
     wants: {}
 """
 from collections import defaultdict
@@ -22,7 +22,7 @@ async def factor_rho(n):
 
 
 async def factor_ecm(n):
-    res = (await run_shell(f"echo {n} | ecm -q 3000000"))[0]  # shell module
+    res = (await run_shell(f"echo {n} | ecm -q 3000000"))[0]
     prefactors = list(map(int, res.split()))
     factors = []
     for prefactor in prefactors:
@@ -31,7 +31,7 @@ async def factor_ecm(n):
 
 
 async def _factor(n):
-    if await await_sync(sympy.isprime, n):  # try_await module
+    if await await_sync(sympy.isprime, n):
         return [n]
     if n < 10 ** 38:
         return await factor_rho(n)
@@ -42,7 +42,7 @@ async def factor(n):
     return sorted(await _factor(int(n)))
 
 
-@dot('factor')  # dot module
+@dot('factor')
 async def factor_text(n=None):
     if n is None:
         return "No number to factor"

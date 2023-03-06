@@ -6,7 +6,7 @@
       dostoevsky: dostoevsky
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/mood.py
-    priority: 26
+    priority: 27
     version: 0.2.0
     wants: {}
 """
