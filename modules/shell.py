@@ -1,13 +1,13 @@
 """
-    description: run and use shell via .sh
+    description: run and use shell via .sh & run shell functions
     name: shell
     needs:
       dot: 0.1.0
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/shell.py
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/shell.py
     priority: 17
-    version: 0.1.1
+    version: 0.2.0
     wants: {}
 """
 import asyncio
@@ -26,6 +26,6 @@ def run_sync_shell(arguments, capture_output=True, check=True, encoding='utf-8',
 
 
 @dot('sh')
-async def sh(code=''):
+async def shell(code=''):
     text, returncode = await run_shell(code)
     return text + (f"\n\nReturn code: {returncode}" if returncode != 0 else "")

@@ -8,7 +8,7 @@
       tg_name: 0.0.0
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/channel_join_requests.py
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/channel_join_requests.py
     priority: 21
     version: 0.0.0
     wants: {}
@@ -56,7 +56,6 @@ class OneChannelJoinRequests:
 
 class ChannelJoinRequestsModule:
     def __init__(self):
-        # config_loader module
         self.config = ModuleConfig('channel_join_requests',
                                    default_dict={'channel_ids': [], 'requesters': {}})
         self.channels = [OneChannelJoinRequests(id, self) for id in self.config.channel_ids]

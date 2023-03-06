@@ -6,33 +6,33 @@
     once: false
     origin: https://gist.github.com/miralushch/b43ce0642f89814981f341308ba9dac9
     priority: 0
-    version: 0.32.6
+    version: 0.32.8
     wants: {}
 """
 from tgpy.modules import get_user_modules, get_module_names, delete_module_file, Module
-import aiohttp
+from aiohttp import ClientSession
 from enum import Enum
 from pathlib import Path
-import io
+from io import BytesIO
 from typing import Tuple, Dict, List, Set, Callable, Awaitable, Union, TypeAlias
 from types import ModuleType
 from urllib.parse import urlparse
 from datetime import datetime
-import tgpy.api
+from tgpy.api import config, parse_tgpy_message, tgpy_eval
 from telethon.errors.rpcerrorlist import MessageTooLongError
 from telethon.tl.types import MessageEntityCode
-import yaml
-import gzip
-import subprocess
-import sys
+from yaml import safe_load
+from gzip import compress, decompress
+from subprocess import run
+from sys import executable
 
 
 def pip_install(lib: str, piplib: str | None = None, output: List[str] | None = None) -> ModuleType:
     try:
         return __import__(lib)
     except ImportError:
-        subprocess.run([sys.executable, "-m", "pip",
-                        "install", piplib or lib], check=True)
+        run([executable, "-m", "pip",
+             "install", piplib or lib], check=True)
         if output is not None:
             output.append(f"installed pip module {piplib}")
         return __import__(lib)
@@ -45,15 +45,6 @@ VersionInfo: TypeAlias = pip_install(  # type: ignore [valid-type]
     'semver').VersionInfo
 python_minifier = pip_install('python_minifier', 'python-minifier')
 gists = pip_install('gists', 'gists.py')
-
-
-try:
-    from tgpy.message_design import get_code
-except ImportError:
-    from tgpy.message_design import parse_message
-
-    def get_code(message):
-        return parse_message(message).code
 
 
 class DependencyException(Exception):
@@ -77,7 +68,7 @@ Codec = Enum("Codec", ["NONE", "GZIP", "ZSTD", "BROTLI"])
 class Nya:
     """nya, the best module manager of tgpy"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """DONT TOUCH THIS"""
         async def msg_handler(src: str) -> str:
             source = urlparse(src)
@@ -88,18 +79,19 @@ class Nya:
             orig = await client.get_messages(  # type: ignore [name-defined]
                 chat, ids=int(id))
             if orig.media is not None:
-                f = io.BytesIO()
+                f = BytesIO()
                 await orig.download_media(f)
                 f.seek(0)
                 text = f.read().decode()
             else:
-                text = get_code(orig) or orig.raw_text
+                text = parse_tgpy_message(orig).code or orig.raw_text
             return text
         self.__gist_client = gists.Client()
 
         async def gist_handler(src: str) -> str:
-            return (await self.__gist_client.get_gist(src.split("/")[-1])).files[0].content
-        self.__aiohttp_session = aiohttp.ClientSession()
+            return (await self.__gist_client.get_gist(  # type: ignore [no-any-return]
+                src.split("/")[-1])).files[0].content
+        self.__aiohttp_session = ClientSession()
 
         async def plain_text_handler(src: str) -> str:
             return await (await self.__aiohttp_session.get(src)).text()
@@ -108,23 +100,24 @@ class Nya:
             ("https", "gist.github.com"): gist_handler,
             ("https", "raw.githubusercontent.com"): plain_text_handler
         }
-        if tgpy.api.config.get("registry") is None:
-            tgpy.api.config.set("registry", dict())
-            tgpy.api.config.save()
-        if tgpy.api.config.get("share.codec") is None:
-            tgpy.api.config.set("share.codec", Codec.NONE.value)
-            tgpy.api.config.save()
-        if tgpy.api.config.get("share.by_file") is None:
-            tgpy.api.config.set("share.by_file", False)
-            tgpy.api.config.save()
-        if tgpy.api.config.get("share.minify") is None:
-            tgpy.api.config.set("share.minify", False)
-            tgpy.api.config.save()
+        if config.get("registry") is None:
+            config.set("registry", dict())
+            config.save()
+        if config.get("share.codec") is None:
+            config.set("share.codec", Codec.NONE.value)
+            config.save()
+        if config.get("share.by_file") is None:
+            config.set("share.by_file", False)
+            config.save()
+        if config.get("share.minify") is None:
+            config.set("share.minify", False)
+            config.save()
 
-    def __iter_registry(self):
-        return iter(tgpy.api.config.get("registry").keys())
+    def __iter_registry(self) -> List[str]:
+        return iter(config.get(  # type: ignore [no-any-return]
+            "registry").keys())
 
-    async def __get_from(self, src: str):
+    async def __get_from(self, src: str) -> str:
         source = urlparse(src)
         return await self.__source_handlers[(source.scheme, source.netloc)](src)
 
@@ -136,11 +129,14 @@ class Nya:
             except:
                 pass
         if codec == Codec.BROTLI:
-            return "ʌ" + base65536.encode(brotli.compress(code.encode(), brotli.MODE_TEXT, 11))
+            return "ʌ" + base65536.encode(  # type: ignore [no-any-return]
+                brotli.compress(code.encode(), brotli.MODE_TEXT, 11))
         elif codec == Codec.ZSTD:
-            return "zstd:" + base65536.encode(zstd.compress(code.encode(), 22))
+            return "zstd:" + base65536.encode(  # type: ignore [no-any-return]
+                zstd.compress(code.encode(), 22))
         elif codec == Codec.GZIP:
-            return "b65536:" + base65536.encode(gzip.compress(code.encode(), 9))
+            return "b65536:" + base65536.encode(  # type: ignore [no-any-return]
+                compress(code.encode(), 9))
         elif codec == Codec.NONE:
             return code
         else:
@@ -148,15 +144,17 @@ class Nya:
 
     def __decode_code(self, code: str) -> str:
         if code.startswith("b65536:"):
-            return gzip.decompress(base65536.decode(code[7:])).decode()
+            return decompress(base65536.decode(code[7:])).decode()
         elif code.startswith("zstd:"):
-            return zstd.decompress(base65536.decode(code[5:])).decode()
+            return zstd.decompress(  # type: ignore [no-any-return]
+                base65536.decode(code[5:])).decode()
         elif code.startswith("ʌ"):
-            return brotli.decompress(base65536.decode(code[1:])).decode()
+            return brotli.decompress(  # type: ignore [no-any-return]
+                base65536.decode(code[1:])).decode()
         else:
             return code
 
-    def __check_dep(self, name: str, version: str, dep: str, dep_version: str):
+    def __check_dep(self, name: str, version: str, dep: str, dep_version: str) -> None:
         if dep in modules:  # type: ignore [name-defined]
             dep_module = modules[dep]  # type: ignore [name-defined]
             curr_dep_version = VersionInfo.parse(
@@ -171,7 +169,7 @@ class Nya:
 
     def __parse(self, text: str) -> Tuple[str, VersionInfo, str, Dict[str, str], Dict[str, str], Dict[str, str], str]:
         assert '"""' in text
-        header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
+        header = safe_load(text.split('"""', 2)[1].strip("\n"))
         name = header["name"]
         version = VersionInfo.parse(
             header["version"] if "version" in header else "0.0.0")
@@ -182,7 +180,7 @@ class Nya:
         code = self.__decode_code(text.split('"""', 2)[2].strip("\n"))
         return name, version, description, needs, wants, needs_pip, code
 
-    def __print_info(self, name: str, version: VersionInfo, description: str, needs: Dict[str, str], wants: Dict[str, str], needs_pip: Dict[str, str]):
+    def __print_info(self, name: str, version: VersionInfo, description: str, needs: Dict[str, str], wants: Dict[str, str], needs_pip: Dict[str, str]) -> None:
         print(f"{name} {version} ({description})")
         if needs:
             print("needs:")
@@ -202,7 +200,7 @@ class Nya:
             for dep in needs_pip:
                 print(f"- {dep}")
 
-    def __check_deps(self, name: str, version: VersionInfo, needs: Dict[str, str], wants: Dict[str, str], needs_pip: Dict[str, str], output: List[str]):
+    def __check_deps(self, name: str, version: VersionInfo, needs: Dict[str, str], wants: Dict[str, str], needs_pip: Dict[str, str], output: List[str]) -> None:
         for dep, ver in needs.items():
             try:
                 self.__check_dep(name, version, dep, ver)
@@ -221,14 +219,14 @@ class Nya:
         for dep, pip in needs_pip.items():
             pip_install(dep, pip, output)
 
-    async def __run(self, name: str, version: VersionInfo, code: str, output: List[str]):
+    async def __run(self, name: str, version: VersionInfo, code: str, output: List[str]) -> None:
         try:
-            await tgpy.api.tgpy_eval(code)
+            await tgpy_eval(code)
             output.append(f"ran module {name} {version}")
         except:
             output.append(f"failed to run module {name} {version}")
 
-    def __regraph_rec(self, name: str, ordered: List[str], visited: Set[str], visiting: Set[str], deleted: Set[str]):
+    def __regraph_rec(self, name: str, ordered: List[str], visited: Set[str], visiting: Set[str], deleted: Set[str]) -> None:
         if name == "nya" or name in visited or name in deleted:
             return
         module = modules[name]  # type: ignore [name-defined]
@@ -314,7 +312,7 @@ class Nya:
             ordered.append(name)
             visited.add(name)
 
-    def regraph(self):
+    def regraph(self) -> None:
         visited: Set[str]
         visiting: Set[str]
         deleted: Set[str]
@@ -326,11 +324,11 @@ class Nya:
             module.priority = i
             module.save()
 
-    def add_source_handler(self, domain: Tuple[str, str], handler: Callable[[str], Awaitable[str]]):
+    def add_source_handler(self, domain: Tuple[str, str], handler: Callable[[str], Awaitable[str]]) -> None:
         """add a async source handler; domain is ({scheme}, {netloc})"""
         self.__source_handlers[domain] = handler
 
-    async def install(self, origin: str, text: str, force: bool = False):
+    async def install(self, origin: str, text: str, force: bool = False) -> None:
         """install module from provided {origin} and {text}; if {force} is True version will be ignored"""
         output: List[str] = []
         name, version, description, needs, wants, needs_pip, code = self.__parse(
@@ -375,19 +373,19 @@ class Nya:
             )
             module.save()
             output.append(f"installed module {name} {version}")
-            tgpy.api.config.set("nya.last_installed", name)
-            tgpy.api.config.save()
+            config.set("nya.last_installed", name)
+            config.save()
             output.append(f"saved the name of last installed module: {name}")
             await self.__run(name, version, code, output)
         print(*output, sep="\n")
         self.regraph()
 
-    async def reg_install(self, name: str, force: bool = False):
+    async def reg_install(self, name: str, force: bool = False) -> None:
         """install the module {name} using registry"""
-        src = tgpy.api.config.get("registry")[name]
+        src = config.get("registry")[name]
         await self.dep_install(src, await self.__get_from(src), force)
 
-    async def dep_install(self, origin: str, text: str, force: bool = False, last_tried: str | None = None):
+    async def dep_install(self, origin: str, text: str, force: bool = False, last_tried: str | None = None) -> None:
         """install the module {name} using registry"""
         try:
             await self.install(origin, text, force)
@@ -398,119 +396,119 @@ class Nya:
                 await self.reg_install(e.name)
                 await self.dep_install(origin, text, force, last_tried=e.name)
 
-    async def update(self):
+    async def update(self) -> None:
         """update all installed modules using registry"""
         for name in self.__iter_registry():
             if name in modules:  # type: ignore [name-defined]
                 await self.reg_install(name)
-        await tgpy.api.tgpy_eval("")
+        await tgpy_eval("")
         self.regraph()
 
-    async def reg_pull_info(self, name: str):
+    async def reg_pull_info(self, name: str) -> None:
         """get info about the module {name} using registry"""
-        src = tgpy.api.config.get("registry")[name]
+        src = config.get("registry")[name]
         self.pull_info(await self.__get_from(src))
 
-    def print_list(self):
+    def print_list(self) -> None:
         """print the list of available modules"""
         print(*list(self.__iter_registry()), sep="\n")
 
-    async def share_registry(self):
+    async def share_registry(self) -> None:
         """share the list of available modules; can be imported through nya.import_from_reply()"""
         ans = '"""\n    sources:\n' + \
-            "\n".join([f"        {name}: \"{tgpy.api.config.get('registry')[name]}\"" for name in list(
+            "\n".join([f"        {name}: \"{config.get('registry')[name]}\"" for name in list(
                 self.__iter_registry())]) + '\n"""'
         await ctx.msg.respond(ans, formatting_entities=[MessageEntityCode(0, len(ans.encode('utf-16-le')) // 2)])  # type: ignore [name-defined]
 
-    def set_source(self, name: str, source: str, overwrite: bool = True):
+    def set_source(self, name: str, source: str, overwrite: bool = True) -> None:
         """set the source {source} of module {name} to the registry"""
-        if overwrite or name not in tgpy.api.config.get(f"registry"):
-            tgpy.api.config.set(f"registry.{name}", source)
-            tgpy.api.config.save()
+        if overwrite or name not in config.get(f"registry"):
+            config.set(f"registry.{name}", source)
+            config.save()
 
-    def remove_source(self, name: str):
+    def remove_source(self, name: str) -> None:
         """remove the source of module {name} from the registry"""
-        tgpy.api.config.unset(f"registry.{name}")
-        tgpy.api.config.save()
+        config.unset(f"registry.{name}")
+        config.save()
 
     def get_source(self, name: str) -> str:
         """get the source of module {name} from the registry"""
-        return tgpy.api.config.get(f"registry.{name}")
+        return config.get(f"registry.{name}")  # type: ignore [no-any-return]
 
-    async def share_sources(self, names: List[str]):
+    async def share_sources(self, names: List[str]) -> None:
         """share the sources of modules listed in {names} from the registry; can be imported through nya.import_from_reply()"""
         ans = '"""\n    sources:\n' + \
             "\n".join(
-                [f"        {name}: \"{tgpy.api.config.get('registry')[name]}\"" for name in names]) + '\n"""'
+                [f"        {name}: \"{config.get('registry')[name]}\"" for name in names]) + '\n"""'
         await ctx.msg.respond(ans, formatting_entities=[MessageEntityCode(0, len(ans.encode('utf-16-le')) // 2)])  # type: ignore [name-defined]
 
-    async def set_src_to_reply(self, overwrite: bool = True):
+    async def set_src_to_reply(self, overwrite: bool = True) -> None:
         """set the source of replied module to the registry"""
         orig = await ctx.msg.get_reply_message()  # type: ignore [name-defined]
         if orig.media is not None:
-            f = io.BytesIO()
+            f = BytesIO()
             await orig.download_media(f)
             f.seek(0)
             text = f.read().decode()
         else:
-            text = get_code(orig) or orig.raw_text
+            text = parse_tgpy_message(orig).code or orig.raw_text
         if orig.chat.username:
             origin = f"https://t.me/{orig.chat.username}/{orig.id}"
         else:
             origin = f"https://t.me/c/{orig.chat.id}/{orig.id}"
         assert '"""' in text
-        header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
+        header = safe_load(text.split('"""', 2)[1].strip("\n"))
         name = header["name"]
         self.set_source(name, origin, overwrite)
 
-    def import_src_list(self, text: str, overwrite: bool = True):
+    def import_src_list(self, text: str, overwrite: bool = True) -> None:
         """import the source list from {text} to the registry"""
         assert '"""' in text
-        header = yaml.safe_load(text.split('"""', 2)[1].strip("\n"))
+        header = safe_load(text.split('"""', 2)[1].strip("\n"))
         sources = header["sources"]
         for name, source in sources.items():
             self.set_source(name, source, overwrite)
 
-    async def import_from_reply(self, overwrite: bool = True):
+    async def import_from_reply(self, overwrite: bool = True) -> None:
         """import the source list from reply to the registry"""
         orig = await ctx.msg.get_reply_message()  # type: ignore [name-defined]
-        text = get_code(orig) or orig.raw_text
+        text = parse_tgpy_message(orig).code or orig.raw_text
         self.import_src_list(text, overwrite)
 
-    async def import_from_src(self, src: str, overwrite: bool = True):
+    async def import_from_src(self, src: str, overwrite: bool = True) -> None:
         """import the source list from the source {src} to the registry"""
         self.import_src_list(await self.__get_from(src), overwrite)
 
-    async def from_reply(self, force: bool = False):
+    async def from_reply(self, force: bool = False) -> None:
         """install module from reply; if {force} is True version will be ignored"""
         orig = await ctx.msg.get_reply_message()  # type: ignore [name-defined]
         if orig.media is not None:
-            f = io.BytesIO()
+            f = BytesIO()
             await orig.download_media(f)
             f.seek(0)
             text = f.read().decode()
         else:
-            text = get_code(orig) or orig.raw_text
+            text = parse_tgpy_message(orig).code or orig.raw_text
         if orig.chat.username:
             origin = f"https://t.me/{orig.chat.username}/{orig.id}"
         else:
             origin = f"https://t.me/c/{orig.chat.id}/{orig.id}"
         await self.dep_install(origin, text, force)
 
-    def get_info(self, name: str):
+    def get_info(self, name: str) -> None:
         """get information about installed module {name}"""
         self.__print_info(
             *self.__parse(modules[name].code)[:-1])  # type: ignore [name-defined]
 
-    def pull_info(self, text: str):
+    def pull_info(self, text: str) -> None:
         """get information about given module by {text}"""
         self.__print_info(*self.__parse(text)[:-1])
 
-    async def share(self, name: str, codec: Codec | None = None, by_file: bool | None = None, minify: bool | None = None):
+    async def share(self, name: str, codec: Codec | None = None, by_file: bool | None = None, minify: bool | None = None) -> None:
         """share installed module {name}; to see list of available codecs run nya.codec_list()"""
         code = modules[name].code  # type: ignore [name-defined]
         assert code.startswith('"""')
-        header = yaml.safe_load(code.split('"""', 2)[1].strip("\n"))
+        header = safe_load(code.split('"""', 2)[1].strip("\n"))
         h = f'    name: {header["name"]}\n'
         if "version" in header and header["version"] != "0.0.0":
             h += f'    version: {header["version"]}\n'
@@ -524,16 +522,16 @@ class Nya:
             h += f'    needs_pip: {header["needs_pip"]}\n'
         code = code.split('"""', 2)[2]
         if codec is None:
-            codec = Codec(value=tgpy.api.config.get("share.codec"))
+            codec = Codec(value=config.get("share.codec"))
         if by_file is None:
-            by_file = tgpy.api.config.get("share.by_file")
+            by_file = config.get("share.by_file")
         if minify is None:
-            minify = tgpy.api.config.get("share.minify")
+            minify = config.get("share.minify")
         text = '"""\n' + h + '"""\n' + self.__encode_code(code, codec, minify)
         if by_file:
             text_metadata = '\n'.join(line.strip()
                                       for line in h.split('\n') if line.strip())
-            f = io.BytesIO()
+            f = BytesIO()
             f.name = f"{name}.py"
             f.write(text.encode())
             f.seek(0)
@@ -547,40 +545,40 @@ class Nya:
             await ctx.msg.respond(  # type: ignore [name-defined]
                 text, formatting_entities=fe)
 
-    def codec_list(self):
+    def codec_list(self) -> None:
         print(*[codec.name for codec in Codec], sep=", ")
 
-    def set_default_codec(self, codec: Codec):
+    def set_default_codec(self, codec: Codec) -> None:
         """set the default codec for share"""
-        tgpy.api.config.set("share.codec", codec.value)
-        tgpy.api.config.save()
+        config.set("share.codec", codec.value)
+        config.save()
 
-    def set_default_by_file(self, by_file: bool):
+    def set_default_by_file(self, by_file: bool) -> None:
         """set the default by_file for share"""
-        tgpy.api.config.set("share.by_file", by_file)
-        tgpy.api.config.save()
+        config.set("share.by_file", by_file)
+        config.save()
 
-    def set_default_minify(self, minify: bool):
+    def set_default_minify(self, minify: bool) -> None:
         """set the default minify for share"""
-        tgpy.api.config.set("share.minify", minify)
-        tgpy.api.config.save()
+        config.set("share.minify", minify)
+        config.save()
 
-    def remove(self, name: str | None = None):
+    def remove(self, name: str | None = None) -> None:
         """remove module {name}; removes the last installed module if no name is specified"""
         if name is None:
-            name = tgpy.api.config.get("nya.last_installed")
+            name = config.get("nya.last_installed")
         delete_module_file(name)
         print(f"removed module {name}.")
         if name != "nya":
             self.regraph()
 
-    def print_graph(self):
+    def print_graph(self) -> None:
         """print dependency graph"""
         for name in modules:  # type: ignore [name-defined]
             self.get_info(name)
             print()
 
-    async def run(self, text: str):
+    async def run(self, text: str) -> None:
         """run module from provided {text}"""
         output: List[str] = []
         name, version, _, needs, wants, needs_pip, code = self.__parse(text)
@@ -589,10 +587,10 @@ class Nya:
         print(*output, sep="\n")
         self.regraph()
 
-    async def run_from_reply(self):
+    async def run_from_reply(self) -> None:
         """run module from reply"""
         orig = await ctx.msg.get_reply_message()  # type: ignore [name-defined]
-        text = get_code(orig) or orig.raw_text
+        text = parse_tgpy_message(orig).code or orig.raw_text
         try:
             origin = f"https://t.me/{orig.chat.username}/{orig.id}"
         except:

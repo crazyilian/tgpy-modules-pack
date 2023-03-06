@@ -1,10 +1,10 @@
 """
-    description: get username/first name/title of telethon entity
+    description: get username/first name/title of telethon entity object
     name: tg_name
     needs: {}
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/tg_name.py
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/tg_name.py
     priority: 12
     version: 0.0.0
     wants: {}

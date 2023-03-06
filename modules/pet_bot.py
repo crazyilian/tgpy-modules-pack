@@ -5,9 +5,9 @@
       config_loader: 0.0.0
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/pet_bot.py
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/pet_bot.py
     priority: 20
-    version: 0.0.0
+    version: 0.0.1
     wants: {}
 """
 import telethon
@@ -43,7 +43,7 @@ class PetBot:
         await self.bot.send_message(chat_id, text, **kwargs)
 
     def __getattr__(self, item):
-        return self.bot.item
+        return getattr(self.bot, item)
 
 
 pet_bot = PetBot()

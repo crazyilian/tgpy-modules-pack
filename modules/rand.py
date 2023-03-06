@@ -7,7 +7,7 @@
       expand: 0.0.0
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/rand.py
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/rand.py
     priority: 23
     version: 0.0.0
     wants: {}
@@ -15,6 +15,6 @@
 import random
 
 
-@dot('rand')  # dot module
+@dot('rand')
 def rand(s=''):
     return random.choice(expand(s))

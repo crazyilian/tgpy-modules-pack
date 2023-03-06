@@ -5,7 +5,7 @@
     needs: {}
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/config_loader.py
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/config_loader.py
     priority: 14
     version: 0.0.0
     wants: {}

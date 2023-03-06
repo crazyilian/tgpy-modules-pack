@@ -4,13 +4,21 @@
     needs: {}
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/message_design.py
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/message_design.py
     priority: 18
-    version: 0.0.0
+    version: 1.0.0
     wants: {}
 """
 import tgpy._core.message_design as message_design
+import tgpy.api
 
-message_design.TITLE = "$>"
+DEFAULT_TITLE = message_design.TITLE
+message_design.TITLE = tgpy.api.config.get('message_design.prefix', DEFAULT_TITLE)
 
-__all__ = []
+
+def set_tgpy_prefix(prefix=DEFAULT_TITLE):
+    message_design.TITLE = prefix
+    tgpy.api.config.set('message_design.prefix', prefix)
+
+
+__all__ = ['set_tgpy_prefix']

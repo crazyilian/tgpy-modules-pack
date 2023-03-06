@@ -2,12 +2,12 @@
     description: decorator dot to make function usable through .{prx}, but run it as hook
     name: dot_hook
     needs:
-      try_await: 0.0.0
+      await_utils: 0.0.0
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/dot_hook.py
-    priority: 27
-    version: 0.0.0
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/dot_hook.py
+    priority: 28
+    version: 0.0.1
     wants: {}
 """
 import tgpy.api
@@ -21,9 +21,9 @@ def dot_hook(prx, prevent=True):
             txt = message.raw_text
             if txt.lower().startswith(f".{prx} ") or txt.lower().startswith(f".{prx}\n"):
                 txt = txt[len(prx) + 2:]
-                res = await try_await(f(txt, message=message, is_edit=is_edit))
+                res = await await_if_awaitable(f(txt, message=message, is_edit=is_edit))
             elif txt.lower() == f".{prx}":
-                res = await try_await(f(message=message, is_edit=is_edit))
+                res = await await_if_awaitable(f(message=message, is_edit=is_edit))
             else:
                 return True
 

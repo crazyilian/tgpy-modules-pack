@@ -7,9 +7,9 @@
       tg_name: 0.0.0
     needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/track_last_seen.py
-    priority: 30
-    version: 0.0.0
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/track_last_seen.py
+    priority: 31
+    version: 0.0.2
     wants: {}
 """
 import telethon
@@ -23,6 +23,12 @@ class TrackLastSeenModule:
                                    default_dict={'watches': {}})
         self.handlers = []
         asyncio.create_task(self.add(*self.config.watches.keys()))
+        self.me = None
+
+    async def get_me(self):
+        if self.me is None:
+            self.me = await client.get_me()
+        return self.me
 
     async def get_id_name_by_entities(self, entities):
         res = {}
@@ -46,7 +52,8 @@ class TrackLastSeenModule:
 
         @client.on(telethon.events.UserUpdate(chats=add_handler, func=lambda e: e.status))
         async def user_update_event_handler(event):
-            name = self.config.watches.get(event.user_id, None)
+            me = await self.get_me()
+            name = self.config.watches.get(event.user_id, None) if event.user_id != me.id else me.first_name
             if name is None:
                 return
             text = ''
