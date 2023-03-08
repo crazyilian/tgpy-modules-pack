@@ -7,7 +7,7 @@
       github: pygithub
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules/nya_github_handler.py
-    priority: 35
+    priority: 33
     version: 0.1.2
     wants: {}
 """

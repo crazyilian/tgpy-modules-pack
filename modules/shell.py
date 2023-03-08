@@ -6,7 +6,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/shell.py
-    priority: 17
+    priority: 15
     version: 0.2.0
     wants: {}
 """

@@ -5,7 +5,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/message_design.py
-    priority: 18
+    priority: 16
     version: 1.0.0
     wants: {}
 """

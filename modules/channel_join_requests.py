@@ -9,7 +9,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/channel_join_requests.py
-    priority: 21
+    priority: 19
     version: 0.0.0
     wants: {}
 """

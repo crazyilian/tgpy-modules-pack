@@ -7,7 +7,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/shvenv.py
-    priority: 32
+    priority: 30
     version: 0.1.1
     wants: {}
 """

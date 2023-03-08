@@ -5,17 +5,25 @@
     needs:
       config_loader: 0.0.0
       tg_name: 0.0.0
-    needs_pip: []
+    needs_pip: {}
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/yes_no_answers.py
-    priority: 24
-    version: 0.1.1
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/yes_no_answers.py
+    priority: 22
+    version: 0.3.0
     wants: {}
 """
 import telethon
+import re
 
 handle_yes_no_chats = set()
 really_handling_yes_no_chats = set()
+
+last_word_re = re.compile(r"(^|^.*?\W)(\w*)\W*$", re.DOTALL)
+
+
+def get_last_word(s):
+    m = last_word_re.match(s)
+    return m.group(2)
 
 
 class YesNoAnswers:
@@ -46,12 +54,14 @@ class YesNoAnswers:
             if event.chat_id not in self.chats:
                 return
             for word, suffix in self.config.suffixes.items():
-                if not event.text.lower().endswith(suffix):
+                answer_last_word = get_last_word(event.text.lower())
+                if not answer_last_word.endswith(suffix.lower()) or answer_last_word == word.lower():
                     continue
                 orig = await event.get_reply_message()
-                if orig and orig.text.lower().split()[-1:] == [word]:
-                    await event.reply("Ловко парировал(а) " + get_name(event.sender))
-                    break
+                if not orig or get_last_word(orig.text.lower()) != word.lower():
+                    continue
+                await event.reply("Ловко парировал(а) " + get_name(event.sender))
+                break
 
     def remove_chat(self, *chats):
         """remove chat handlers"""

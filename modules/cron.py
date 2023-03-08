@@ -6,7 +6,7 @@
       croniter: croniter
     once: false
     origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/cron.py
-    priority: 19
+    priority: 17
     version: 0.1.0
     wants: {}
 """

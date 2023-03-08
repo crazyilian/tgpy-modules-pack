@@ -6,7 +6,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/dot_hook.py
-    priority: 28
+    priority: 26
     version: 0.0.1
     wants: {}
 """

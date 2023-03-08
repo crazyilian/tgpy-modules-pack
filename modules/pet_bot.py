@@ -6,7 +6,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/pet_bot.py
-    priority: 20
+    priority: 18
     version: 0.0.1
     wants: {}
 """

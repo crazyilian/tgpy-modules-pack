@@ -4,12 +4,11 @@
     needs:
       config_loader: 0.0.0
       dot: 0.2.0
-      try_await: 0.0.0
     needs_pip:
       pixivpy_async: PixivPy-Async
     once: false
-    origin: https://raw.githubusercontent.com/crazyilian/tgpy-modules/main/modules-src/pixiv.py
-    priority: 16
+    origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/pixiv.py
+    priority: 36
     version: 0.1.0
     wants: {}
 """
@@ -186,7 +185,7 @@ async def pixiv_dot_handler(text=''):
     if isinstance(tree, dict):
         return "Unknown command"
     ctx.is_manual_output = True
-    ans = await try_await(tree[0](*tree[1]))
+    ans = await tree[0](*tree[1])
     await ctx.msg.edit(ans)
 
 

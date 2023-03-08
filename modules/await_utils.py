@@ -6,7 +6,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/await_utils.py
-    priority: 25
+    priority: 23
     version: 0.0.0
     wants: {}
 """

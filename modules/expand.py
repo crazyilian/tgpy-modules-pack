@@ -5,7 +5,7 @@
     needs_pip: {}
     once: false
     origin: https://t.me/tgpy_flood/392
-    priority: 22
+    priority: 20
     version: 0.0.0
     wants: {}
 """

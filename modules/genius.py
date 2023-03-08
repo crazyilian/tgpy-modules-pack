@@ -8,7 +8,7 @@
       html2text: html2text
     once: false
     origin: https://t.me/tgpy_flood/28543
-    priority: 34
+    priority: 32
     version: 0.3.1
     wants: {}
 """

@@ -5,8 +5,8 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/tex.py
-    priority: 29
-    version: 0.1.0
+    priority: 27
+    version: 0.1.1
     wants: {}
 """
 import re
@@ -265,7 +265,7 @@ def apply_tex(text):
 async def tex_hook(message=None, is_edit=None):
     text = message.text
     if text.startswith(".tex ") or text.startswith(".tex\n"):
-        text = text[6:]
+        text = text[5:]
     else:
         is_tex_text = any(from_ in text for from_ in ALPHABET) or "^" in text
         if not is_tex_text:

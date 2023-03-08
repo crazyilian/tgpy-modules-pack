@@ -8,7 +8,7 @@
       sympy: sympy
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/factor.py
-    priority: 26
+    priority: 24
     version: 0.1.1
     wants: {}
 """

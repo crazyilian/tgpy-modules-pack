@@ -6,7 +6,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/cpp.py
-    priority: 30
+    priority: 28
     version: 0.0.0
     wants: {}
 """
