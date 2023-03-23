@@ -2,280 +2,122 @@
     description: apply tex automatically and via .tex
     name: tex
     needs: {}
-    needs_pip: {}
+    needs_pip:
+      unicodeit: unicodeit
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/tex.py
     priority: 27
-    version: 0.1.1
+    version: 0.3.8
     wants: {}
 """
-import re
 import tgpy.api
+import unicodeit
 
-ALPHABET = {
-    # Greek letters
-    "\\Alpha": "Α",
-    "\\alpha": "α",
-    "\\Beta": "Β",
-    "\\beta": "β",
-    "\\Gamma": "Γ",
-    "\\gamma": "γ",
-    "\\Delta": "Δ",
-    "\\delta": "δ",
-    "\\Epsiolon": "Ε",
-    "\\epsilon": "ϵ",
-    "\\varepsilon": "ε",
-    "\\Zeta": "Ζ",
-    "\\zeta": "ζ",
-    "\\Eta": "Η",
-    "\\eta": "η",
-    "\\Theta": "Θ",
-    "\\theta": "θ",
-    "\\Iota": "Ι",
-    "\\iota": "ι",
-    "\\Kappa": "Κ",
-    "\\kappa": "κ",
-    "\\Lambda": "Λ",
-    "\\lambda": "λ",
-    "\\Mu": "Μ",
-    "\\mu": "μ",
-    "\\Nu": "Ν",
-    "\\nu": "ν",
-    "\\Xi": "Ξ",
-    "\\xi": "ξ",
-    "\\Omicron": "Ο",
-    "\\omicron": "ο",
-    "\\Pi": "Π",
-    "\\pi": "π",
-    "\\Rho": "Ρ",
-    "\\rho": "ρ",
-    "\\Sigma": "Σ",
-    "\\sigma": "σ",
-    "\\varsigma": "ς",
-    "\\Tau": "Τ",
-    "\\tau": "τ",
-    "\\Upsilon": "Υ",
-    "\\upsilon": "υ",
-    "\\Phi": "Φ",
-    "\\phi": "ϕ",
-    "\\varphi": "φ",
-    "\\Chi": "Χ",
-    "\\chi": "χ",
-    "\\Psi": "Ψ",
-    "\\psi": "ψ",
-    "\\Omega": "Ω",
-    "\\omega": "ω",
+AUTOACTIVATE = ['^', r'\alpha', r'\beta', r'\Gamma', r'\gamma', r'\Delta', r'\delta', r'\epsilon', r'\varepsilon',
+                r'\zeta', r'\eta', r'\Theta', r'\theta', r'\varthera', r'\iota', r'\kappa', r'\varkappa', r'\Lambda',
+                r'\lambda', r'\mu', r'\nu', r'\Xi', r'\xi', r'\Pi', r'\pi', r'\varpi', r'\rho', r'\varrho', r'\Sigma',
+                r'\sigma', r'\varsigma', r'\tau', r'\Upsilon', r'\upsilon', r'\Phi', r'\phi', r'\varphi', r'\chi',
+                r'\Psi', r'\psi', r'\Omega', r'\omega', r'\mathbb', r'\mathcal', r'\ne', r'\approx', r'\le', r'\ge',
+                r'\leqslant', r'\geqslant', r'\pm', r'\mp', r'\times', r'\cdot', r'\div', r'\sqrt', r'\angle', r'\perp',
+                r'\parallel', r'\cong', r'\sim', r'\triangle', r'\equiv', r'\triangleq', r'\propto', r'\infty', r'\ll',
+                r'\gg', r'\lfloor', r'\rfloor', r'\lceil', r'\rceil', r'\circ', r'\cap', r'\cup', r'\subseteq',
+                r'\subset', r'\not', r'\supseteq', r'\supset', r'\in', r'\emptyset', r'\lor', r'\land', r'\neg',
+                r'\oplus', r'\implies', r'\iff', r'\forall', r'\exists', r'\nexists', r'\therefore', r'\because',
+                r'\int', r'\oint', r'\preceq', r'\prec', r'\succeq', r'\succ', r'\d', r'\vdots', r'\cdots', r'\ddots',
+                r'\sum', r'\prod', r'\leftarrow', r'\rightarrow', r'\uparrow', r'\downarrow', r'\leftrightarrow',
+                r'\updownarrow', r'\Leftarrow', r'\Rightarrow', r'\Uparrow', r'\Downarrow', r'\Leftrightarrow',
+                r'\Updownarrow', r'\to', r'\mapsto', r'\nearrow', r'\searrow', r'\swarrow', r'\nwarrow',
+                r'\hookleftarrow', r'\hookrightarrow', r'\leftharpoonup', r'\rightharpoonup', r'\leftharpoondown',
+                r'\rightharpoondown', r'\langle', r'\rangle', r'\vee', r'\wedge', r'\bigvee', r'\bigwedge', r'\bigcap',
+                r'\bigcup', r'\bigoplus', r'\nsubset', r'\nsubseteq', r'\notin', r'\square', r'\blacksquare', r'\ldots',
+                r'\nsupset', r'\nsupseteq', r'\impliedby', r'\ni', r'\notni']
 
-    # Blackboard bold
-    "\\mathbb{A}": "𝔸",
-    "\\mathbb{a}": "𝕒",
-    "\\mathbb{B}": "𝔹",
-    "\\mathbb{b}": "𝕓",
-    "\\mathbb{C}": "ℂ",
-    "\\mathbb{c}": "𝕔",
-    "\\mathbb{D}": "𝔻",
-    "\\mathbb{d}": "𝕕",
-    "\\mathbb{E}": "𝔼",
-    "\\mathbb{e}": "𝕖",
-    "\\mathbb{F}": "𝔽",
-    "\\mathbb{f}": "𝕗",
-    "\\mathbb{G}": "𝔾",
-    "\\mathbb{g}": "𝕘",
-    "\\mathbb{H}": "ℍ",
-    "\\mathbb{h}": "𝕙",
-    "\\mathbb{I}": "𝕀",
-    "\\mathbb{i}": "𝕚",
-    "\\mathbb{J}": "𝕁",
-    "\\mathbb{j}": "𝕛",
-    "\\mathbb{K}": "𝕂",
-    "\\mathbb{k}": "𝕜",
-    "\\mathbb{L}": "𝕃",
-    "\\mathbb{l}": "𝕝",
-    "\\mathbb{M}": "𝕄",
-    "\\mathbb{m}": "𝕞",
-    "\\mathbb{N}": "ℕ",
-    "\\mathbb{n}": "𝕟",
-    "\\mathbb{O}": "𝕆",
-    "\\mathbb{o}": "𝕠",
-    "\\mathbb{P}": "ℙ",
-    "\\mathbb{p}": "𝕡",
-    "\\mathbb{Q}": "ℚ",
-    "\\mathbb{q}": "𝕢",
-    "\\mathbb{R}": "ℝ",
-    "\\mathbb{r}": "𝕣",
-    "\\mathbb{S}": "𝕊",
-    "\\mathbb{s}": "𝕤",
-    "\\mathbb{T}": "𝕋",
-    "\\mathbb{t}": "𝕥",
-    "\\mathbb{U}": "𝕌",
-    "\\mathbb{u}": "𝕦",
-    "\\mathbb{V}": "𝕍",
-    "\\mathbb{v}": "𝕧",
-    "\\mathbb{W}": "𝕎",
-    "\\mathbb{w}": "𝕨",
-    "\\mathbb{X}": "𝕏",
-    "\\mathbb{x}": "𝕩",
-    "\\mathbb{Y}": "𝕐",
-    "\\mathbb{y}": "𝕪",
-    "\\mathbb{Z}": "ℤ",
-    "\\mathbb{z}": "𝕫",
-    "\\mathbb{0}": "𝟘",
-    "\\mathbb{1}": "𝟙",
-    "\\mathbb{2}": "𝟚",
-    "\\mathbb{3}": "𝟛",
-    "\\mathbb{4}": "𝟜",
-    "\\mathbb{5}": "𝟝",
-    "\\mathbb{6}": "𝟞",
-    "\\mathbb{7}": "𝟟",
-    "\\mathbb{8}": "𝟠",
-    "\\mathbb{9}": "𝟡",
-
-    # Basic math
-    "\\ne": "≠",
-    "\\approx": "≈",
-    "\\le": "≤",
-    "\\ge": "≥",
-    "\\leqslant": "⩽",
-    "\\geqslant": "⩾",
-    "\\pm": "±",
-    "\\mp": "∓",
-    "\\times": "×",
-    "\\cdot": "⋅",
-    "\\div": "÷",
-    "\\sqrt": "√",
-
-    # Geometry
-    "\\angle": "∠",
-    "\\perp": "⊥",
-    "\\parallel": "∥",
-    "\\cong": "≅",
-    "\\sim": "~",
-    "\\triangle": "Δ",
-
-    # Algebra
-    "\\equiv": "≡",
-    "\\triangleq": "≜",
-    "\\propto": "∝",
-    "\\infty": "∞",
-    "\\ll": "≪",
-    "\\gg": "≫",
-    "\\lfloor": "⌊",
-    "\\rfloor": "⌋",
-    "\\lceil": "⌈",
-    "\\rceil": "⌉",
-    "\\circ": "∘",
-
-    # Set theory
-    "\\cap": "∩",
-    "\\cup": "∪",
-    "\\not\\subset": "⊄",
-    "\\subseteq": "⊆",
-    "\\subset": "⊂",
-    "\\not\\superset": "⊅",
-    "\\superseteq": "⊇",
-    "\\superset": "⊃",
-    "\\not\\in": "∉",
-    "\\in": "∈",
-    "\\emptyset": "Ø",
-
-    # Logic
-    "\\lor": "∨",
-    "\\land": "∧",
-    "\\neg": "¬",
-    "\\oplus": "⊕",
-    "\\implies": "⇒",
-    "\\iff": "⇔",
-    "\\forall": "∀",
-    "\\exists": "∃",
-    "\\nexists": "∄",
-    "\\therefore": "∴",
-    "\\because": "∵",
-
-    # Calculus
-    "\\int": "∫",
-    "\\oint": "∮",
-    "\\del": "∇",
-    "\\preceq": "≼",
-    "\\prec": "≺",
-    "\\succeq": "≽",
-    "\\succ": "≻",
-    "\\d": "∂",
-
-    # Superscript
-    "^0": "⁰",
-    "^1": "¹",
-    "^2": "²",
-    "^3": "³",
-    "^4": "⁴",
-    "^5": "⁵",
-    "^6": "⁶",
-    "^7": "⁷",
-    "^8": "⁸",
-    "^9": "⁹",
-
-    # Misc
-    "\\dots": "…",
-    "\\vdots": "⋮",
-    "\\cdots": "⋯",
-    "\\ddots": "⋱",
-    "^\\circ": "°",
-    "\\qed": "□",
-    "\\sum": "∑",
-    "\\prod": "∏",
-
-    # Arrows
-    "\\leftarrow": "←",
-    "\\rightarrow": "→",
-    "\\uparrow": "↑",
-    "\\downarrow": "↓",
-    "\\leftrightarrow": "↔",
-    "\\updownarrow": "↕",
-    "\\Leftarrow": "⇐",
-    "\\Rightarrow": "⇒",
-    "\\Uparrow": "⇑",
-    "\\Downarrow": "⇓",
-    "\\Leftrightarrow": "⇔",
-    "\\Updownarrow": "⇕",
-    "\\to": "→",
-    "\\mapsto": "↦",
-    "\\nearrow": "↗",
-    "\\searrow": "↘",
-    "\\swarrow": "↙",
-    "\\nwarrow": "↖",
-    "\\hookleftarrow": "↩",
-    "\\hookrightarrow": "↪",
-    "\\leftharpoonup": "↼",
-    "\\rightharpoonup": "⇀",
-    "\\leftharpoondown": "↽",
-    "\\rightharpoondown": "⇁",
+ALIAS = {'\\' + c * 2: f'\\mathbb{{{c}}}' for c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'}
+ALIAS |= {r'\Alpha': 'A', r'\Beta': 'B', r'\Epsilon': 'E', r'\Zeta': 'Z', r'\Eta': 'H', r'\Iota': 'I', r'\Kappa': 'K',
+          r'\Mu': 'M', r'\Nu': 'N', r'\Omicron': 'O', r'\Rho': 'P', r'\Tau': 'T', r'\Chi': 'X'}
+ALIAS |= {
+    r'\omicron': r'\mitomicron',
+    r'\epsilon': r'ϵ',
+    r'\superseteq': r'\supseteq',
+    r'\superset': r'\supset',
+    r'\nsuperseteq': r'\nsupseteq',
+    r'\nsuperset': r'\nsupset',
+    r'\dots': r'\ldots',
+    r'\qed': r'\blacksquare',
+    r'\divby': r'\vdots',
 }
 
-ALPHABET = {k: v for (k, v) in sorted(ALPHABET.items(), reverse=True)}
+ALIAS |= {
+    r'\not\in': r'\notin',
+    r'\not\supseteq': r'\nsupseteq',
+    r'\not\supset': r'\nsupset',
+    r'\not\superseteq': r'\nsuperseteq',
+    r'\not\superset': r'\nsuperset',
+    r'\not\subseteq': r'\nsubseteq',
+    r'\not\subset': r'\nsubset',
+    r'\not\exists': r'\nexists'
+}
+
+AUTOACTIVATE.extend(ALIAS.keys())
+
+REPLS = unicodeit.data.REPLACEMENTS
+REPLS.remove(('\\not', '\u0338'))
+REPLS_DICT = dict(REPLS)
+unicodeit_REPLACEMENTS = REPLS.copy()
+
+unicodeit.data.SUBSUPERSCRIPTS += [
+    ('^/', '⸍'),
+    ('_/', '⸝'),
+    ('^\\', '⸌'),
+    ('_\\', '⸜')
+]
 
 
-def apply_tex(text):
-    text = text.replace("\\\\", "\x00")
-    text = re.sub(r"\^\{([0-9]+)\}", lambda m: "".join("^" + c for c in m.group(1)), text)
-    for from_, to in ALPHABET.items():
-        text = text.replace(from_, to)
-    text = text.replace("\x00", "\\")
-    return text
+def reset_replacements():
+    global REPLS_DICT
+    REPLS.clear()
+    REPLS.extend(unicodeit_REPLACEMENTS.copy())
+    REPLS_DICT = dict(REPLS)
+
+
+def add_replacements(aliases):
+    for (key, alias) in aliases.items():
+        val = REPLS_DICT.get(alias, alias)
+        REPLS_DICT[key] = val
+    REPLS.clear()
+    REPLS.extend(REPLS_DICT.items())
+    REPLS.sort(key=lambda el: -len(el[0]))
 
 
 async def tex_hook(message=None, is_edit=None):
     text = message.text
     if text.startswith(".tex ") or text.startswith(".tex\n"):
         text = text[5:]
+    elif text.startswith(".ntex ") or text.startswith(".ntex\n"):
+        return await message.edit(text[6:])
     else:
-        is_tex_text = any(from_ in text for from_ in ALPHABET) or "^" in text
+        is_tex_text = is_autotex() and any(c in text for c in AUTOACTIVATE)
         if not is_tex_text:
             return
 
-    text = apply_tex(text)
+    reset_replacements()
+    add_replacements(ALIAS)
+
+    text = unicodeit.replace(text)
     if text != message.text:
-        await message.edit(text)
+        return await message.edit(text)
+
+
+def autotex(flag=True):
+    """set auto activation of .tex to `flag`"""
+    tgpy.api.config.set('tex.auto_activate', flag)
+
+
+def is_autotex():
+    """get if auto activation of .tex is true"""
+    return tgpy.api.config.get('tex.auto_activate', True)
 
 
 tgpy.api.exec_hooks.add('tex', tex_hook)
 
-__all__ = ['apply_tex']
+__all__ = ['autotex', 'is_autotex']

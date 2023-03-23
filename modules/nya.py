@@ -6,11 +6,10 @@
     once: false
     origin: https://gist.github.com/miralushch/b43ce0642f89814981f341308ba9dac9
     priority: 0
-    version: 0.32.8
+    version: 0.32.9
     wants: {}
 """
 from tgpy.modules import get_user_modules, get_module_names, delete_module_file, Module
-from aiohttp import ClientSession
 from enum import Enum
 from pathlib import Path
 from io import BytesIO
@@ -45,6 +44,8 @@ VersionInfo: TypeAlias = pip_install(  # type: ignore [valid-type]
     'semver').VersionInfo
 python_minifier = pip_install('python_minifier', 'python-minifier')
 gists = pip_install('gists', 'gists.py')
+ClientSession: TypeAlias = pip_install(  # type: ignore [valid-type]
+    'aiohttp').ClientSession
 
 
 class DependencyException(Exception):
@@ -94,7 +95,8 @@ class Nya:
         self.__aiohttp_session = ClientSession()
 
         async def plain_text_handler(src: str) -> str:
-            return await (await self.__aiohttp_session.get(src)).text()
+            return await (await self.__aiohttp_session.get(  # type: ignore [no-any-return]
+                src)).text()
         self.__source_handlers: Dict[Tuple[str, str], Callable[[str], Awaitable[str]]] = {
             ("https", "t.me"): msg_handler,
             ("https", "gist.github.com"): gist_handler,
