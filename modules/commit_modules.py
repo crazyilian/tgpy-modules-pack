@@ -7,14 +7,14 @@
     once: false
     origin: https://t.me/c/1796785408/3581
     priority: 34
-    version: 0.1.1
+    version: 0.1.2
     wants: {}
 """
 from tgpy.api import config
 
 def save_registry():
     reg = '"""\n    sources:\n' + \
-          "\n".join([f'        {name}: {repr(source)}' for key, source in config.get("registry").items()]) + \
+          "\n".join([f'        {name}: {repr(source)}' for name, source in config.get("registry").items()]) + \
           '\n"""'
     with open('tgpy-modules-pack/registry.txt', 'w') as f:
         f.write(reg)
