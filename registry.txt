@@ -3,7 +3,7 @@
         await_utils: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/await_utils.py'
         channel_join_requests: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/channel_join_requests.py'
         chlayout: 'https://t.me/tgpy_flood/24578'
-        commit_modules: 'https://t.me/c/1796785408/3581'
+        commit_modules: 'https://t.me/c/1796785408/3593'
         config_loader: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/config_loader.py'
         cpp: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/cpp.py'
         cron: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/cron.py'
