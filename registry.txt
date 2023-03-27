@@ -15,6 +15,7 @@
         gachi: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/gachi.py'
         genius: 'https://t.me/tgpy_flood/28543'
         github_registry: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/github_registry.py'
+        ladno: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/ladno.py'
         macros_base: 'https://t.me/tgpy_flood/24317'
         macros_handler: 'https://t.me/tgpy_flood/26233'
         mention_all: 'https://github.com/crazyilian/tgpy-modules/blob/main/modules/mention_all.py'
