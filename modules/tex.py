@@ -7,9 +7,10 @@
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/tex.py
     priority: 27
-    version: 0.3.8
+    version: 0.3.9
     wants: {}
 """
+import telethon
 import tgpy.api
 import unicodeit
 
@@ -96,8 +97,9 @@ async def tex_hook(message=None, is_edit=None):
     elif text.startswith(".ntex ") or text.startswith(".ntex\n"):
         return await message.edit(text[6:])
     else:
+        is_code_in_msg = any(isinstance(ent, telethon.tl.types.MessageEntityCode) for ent in (message.entities or []))
         is_tex_text = is_autotex() and any(c in text for c in AUTOACTIVATE)
-        if not is_tex_text:
+        if not is_tex_text or is_code_in_msg:
             return
 
     reset_replacements()

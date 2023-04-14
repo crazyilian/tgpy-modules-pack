@@ -1,14 +1,15 @@
 """
-    description: send random file on `ladno()`'
+    description: "send random file on `ladno()` and `.\u043B\u0430\u0434\u043D\u043E`"
     name: ladno
-    needs: {}
+    needs:
+      dot: 0.1.0
     needs_pip:
       base65536: base65536
       zstd: zstd
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/ladno.py
     priority: 38
-    version: 0.0.1
+    version: 0.1.3
     wants: {}
 """
 import telethon
@@ -101,7 +102,7 @@ class Ladno:
 
     async def share_compressed(self):
         """share compressed python list of files"""
-        arr = [repr((f['id'], f['access_hash'], f['file_reference'])) for f in self._get_files()]
+        arr = [(f['id'], f['access_hash'], f['file_reference']) for f in self._get_files()]
         await ctx.msg.respond(f'<code>{compress(repr(arr))}</code>')
         return f'Shared {len(arr)} files'
 
@@ -191,5 +192,20 @@ class Ladno:
 
 
 ladno = Ladno()
+
+
+@dot("ладно")
+def ladno_handler(*args):
+    if len(args) > 0:
+        ind = args[0]
+        if ind.isdigit() or (ind.startswith('-') and ind[1:].isdigit()):
+            return ladno(int(ind))
+    return ladno()
+
+
+@dot("ladno")
+def handler(*args):
+    return ladno_handler(*args)
+
 
 __all__ = ['ladno']
