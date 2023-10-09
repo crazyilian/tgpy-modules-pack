@@ -11,7 +11,7 @@
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/github_registry.py
     priority: 37
-    version: 0.1.0
+    version: 0.1.1
     wants: {}
 """
 from urllib.parse import urlparse
@@ -88,10 +88,15 @@ class GithubWrapper:
         html_url = f'https://github.com/{repo}/tree/{ref}/{path}'
         lxml_root = await self.request_lxml(html_url)
         files = []
-        for element in lxml_root.xpath(
+        for element in lxml_root.xpath(   # old style
                 "//div[contains(@class, 'Box')]"
                 "//div[contains(@class, 'Details')]"
-                "//a[contains(@class, 'js-navigation-open') and contains(@class, 'Link--primary')]"):
+                "//*[name()='svg' and contains(@aria-label, 'Directory')]"
+                "/../..//a[contains(@class, 'js-navigation-open')]") + \
+                lxml_root.xpath(    # new style
+                "//table[contains(@aria-labelledby, 'folders-and-files')]"
+                "//div[contains(@class, 'sr-only') and contains(text(), '(Directory)')]"
+                "/..//a"):
             name = element.text
             files.append({
                 'type': 'dir',
