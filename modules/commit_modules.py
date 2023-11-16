@@ -6,7 +6,7 @@
     needs_pip: {}
     once: false
     origin: https://t.me/c/1796785408/3593
-    priority: 34
+    priority: 33
     version: 0.1.3
     wants: {}
 """

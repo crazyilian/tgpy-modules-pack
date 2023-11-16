@@ -8,7 +8,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/track_last_seen.py
-    priority: 29
+    priority: 28
     version: 0.0.2
     wants: {}
 """

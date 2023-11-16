@@ -6,7 +6,7 @@
     needs_pip: {}
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/gachi.py
-    priority: 35
+    priority: 34
     version: 0.0.1
     wants: {}
 """

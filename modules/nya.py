@@ -4,7 +4,7 @@
     needs: {}
     needs_pip: {}
     once: false
-    origin: https://gist.github.com/miralushch/b43ce0642f89814981f341308ba9dac9
+    origin: https://github.com/crazyilian/tgpy-modules-pack/blob/main/modules/nya.py
     priority: 0
     version: 0.32.9
     wants: {}

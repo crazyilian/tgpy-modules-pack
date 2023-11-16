@@ -8,7 +8,7 @@
       zstd: zstd
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/ladno.py
-    priority: 38
+    priority: 37
     version: 0.1.4
     wants: {}
 """

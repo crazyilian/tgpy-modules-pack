@@ -8,7 +8,7 @@
       pixivpy_async: PixivPy-Async
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/pixiv.py
-    priority: 36
+    priority: 35
     version: 0.1.0
     wants: {}
 """

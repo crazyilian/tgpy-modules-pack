@@ -10,7 +10,7 @@
       lxml: lxml
     once: false
     origin: https://github.com/crazyilian/tgpy-modules/blob/main/modules/github_registry.py
-    priority: 37
+    priority: 36
     version: 0.1.1
     wants: {}
 """
